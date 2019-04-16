@@ -2,7 +2,6 @@ package assert
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/juju/errors"
 	"reflect"
 	"strings"
@@ -17,7 +16,7 @@ func (t *Assert) P(d ...interface{}) {
 		if err != nil {
 			panic(err.Error())
 		}
-		fmt.Println(reflect.ValueOf(i).String(), "->", string(dt))
+		println(reflect.ValueOf(i).String(), "->", string(dt))
 	}
 }
 
