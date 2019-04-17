@@ -4,6 +4,8 @@ var _a = &Assert{}
 
 var P = _a.P
 var Bool = _a.Bool
+var True = _a.Bool
+
 var Err = _a.Err
 var MustNotError = _a.MustNotError
 
@@ -12,6 +14,10 @@ func If(b bool, t, f interface{}) interface{} {
 		return t
 	}
 	return f
+}
+
+func IfNot(a, b interface{}) {
+
 }
 
 func IfEquals(args ...interface{}) bool {
