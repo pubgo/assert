@@ -16,10 +16,6 @@ func If(b bool, t, f interface{}) interface{} {
 	return f
 }
 
-func IfNot(a, b interface{}) {
-
-}
-
 func IfEquals(args ...interface{}) bool {
 	if len(args) == 0 {
 		return true
