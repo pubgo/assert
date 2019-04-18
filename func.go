@@ -48,5 +48,5 @@ func IfIn(a interface{}, args ...interface{}) bool {
 }
 
 func IfNotIn(a interface{}, args ...interface{}) bool {
-	return IfIn(a, args...)
+	return !IfIn(a, args...)
 }
