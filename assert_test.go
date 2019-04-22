@@ -1,14 +1,14 @@
 package assert
 
 import (
-	"github.com/pubgo/gotry"
+	"fmt"
 	"testing"
 )
 
 func a1() error {
-	return gotry.Try(func() {
-		Bool(true, "好东西%d", 1) //strings.Join(CallerInfo(), "\n")
-	}).Error()
+	return _Try(func() {
+		Bool(true, "好东西%d", 1)
+	})
 }
 
 func TestName(t *testing.T) {
@@ -16,9 +16,12 @@ func TestName(t *testing.T) {
 	P(IfEquals(nil, nil))
 	P(IfEquals(0, ""))
 	P(IfEquals("", ""))
-	gotry.Try(func() {
-		Err(a1(), "ok111")
-		MustNotError(a1())
-	}).P()
 
+	fmt.Println(_Try(func() {
+		Err(a1(), "ok111")
+	}))
+
+	fmt.Println(_Try(func() {
+		Err(a1(), "oo")
+	}))
 }

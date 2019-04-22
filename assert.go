@@ -2,7 +2,9 @@ package assert
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"reflect"
 )
 
@@ -18,13 +20,18 @@ func Err(err error, format string, args ...interface{}) {
 	if err == nil {
 		return
 	}
-	panic(err.Error() + "\n" + funcCaller() + fmt.Sprintf(format, args...))
+
+	log.Print(funcCaller() + fmt.Sprintf(format, args...))
+	panic(err)
 }
 
 func MustNotError(err error) {
-	if err != nil {
-		panic(err.Error() + "\n" + funcCaller())
+	if err == nil {
+		return
 	}
+
+	log.Print(funcCaller())
+	panic(err)
 }
 
 func P(d ...interface{}) {
@@ -36,3 +43,25 @@ func P(d ...interface{}) {
 }
 
 var True = Bool
+
+func _Try(fn func()) (err error) {
+	True(fn == nil, "the func is nil")
+
+	_v := reflect.TypeOf(fn)
+	True(_v.Kind() != reflect.Func, "the params type(%s) is not func", _v.String())
+
+	defer func() {
+		defer func() {
+			if r := recover(); r != nil {
+				switch d := r.(type) {
+				case error:
+					err = d
+				case string:
+					err = errors.New(d)
+				}
+			}
+		}()
+		reflect.ValueOf(fn).Call([]reflect.Value{})
+	}()
+	return
+}

@@ -14,7 +14,7 @@ var srcDir = filepath.Join(goPath, "src")
 
 func funcCaller() string {
 	_, file, line, _ := runtime.Caller(callDepth)
-	return strings.TrimPrefix(fmt.Sprintf("%s:%d\n", file, line), fmt.Sprintf("%s%s", srcDir, string(os.PathSeparator)))
+	return strings.TrimPrefix(fmt.Sprintf("%s:%d ", file, line), fmt.Sprintf("%s%s", srcDir, string(os.PathSeparator)))
 }
 
 func If(b bool, t, f interface{}) interface{} {
