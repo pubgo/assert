@@ -1,13 +1,21 @@
 package assert
 
-var _a = &Assert{}
+import (
+	"fmt"
+	"go/build"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
+)
 
-var P = _a.P
-var Bool = _a.Bool
-var True = _a.Bool
+var goPath = build.Default.GOPATH
+var srcDir = filepath.Join(goPath, "src")
 
-var Err = _a.Err
-var MustNotError = _a.MustNotError
+func funcCaller() string {
+	_, file, line, _ := runtime.Caller(callDepth)
+	return strings.TrimPrefix(fmt.Sprintf("%s:%d\n", file, line), fmt.Sprintf("%s%s", srcDir, string(os.PathSeparator)))
+}
 
 func If(b bool, t, f interface{}) interface{} {
 	if b {
@@ -49,4 +57,28 @@ func IfIn(a interface{}, args ...interface{}) bool {
 
 func IfNotIn(a interface{}, args ...interface{}) bool {
 	return !IfIn(a, args...)
+}
+
+// FileExists checks whether a file exists in the given path. It also fails if the path points to a directory or there is an error when trying to check the file.
+func FileExists(path string, msgAndArgs ...interface{}) bool {
+	info, err := os.Lstat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+		Err(err, "")
+	}
+	return info.IsDir()
+}
+
+// DirExists checks whether a directory exists in the given path. It also fails if the path is a file rather a directory or there is an error checking whether it exists.
+func DirExists(path string, msgAndArgs ...interface{}) bool {
+	info, err := os.Lstat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false
+		}
+		Err(err, "")
+	}
+	return !info.IsDir()
 }
