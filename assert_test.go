@@ -24,4 +24,8 @@ func TestName(t *testing.T) {
 	fmt.Println(_Try(func() {
 		Err(a1(), "oo")
 	}))
+
+	fmt.Println(_Try(func() {
+		NotNil(a1())
+	}))
 }

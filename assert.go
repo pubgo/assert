@@ -34,6 +34,13 @@ func MustNotError(err error) {
 	panic(err)
 }
 
+func NotNil(err error) {
+	if err == nil {
+		return
+	}
+	panic(err)
+}
+
 func P(d ...interface{}) {
 	for _, i := range d {
 		dt, err := json.MarshalIndent(i, "", "\t")
