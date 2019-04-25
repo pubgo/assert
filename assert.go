@@ -5,21 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"strings"
 )
 
 const callDepth = 2
 
-var _stacks []string
-
-func _log(s string) {
-	_stacks = append(_stacks, s)
-}
-
 func Bool(b bool, format string, args ...interface{}) {
 	if b {
-		_log(funcCaller() + fmt.Sprintf(format, args...))
-		panic("")
+		panic(NewKErr(funcCaller()+fmt.Sprintf(format, args...), nil))
 	}
 }
 
@@ -27,25 +19,21 @@ func Err(err error, format string, args ...interface{}) {
 	if err == nil {
 		return
 	}
-
-	_log(funcCaller() + fmt.Sprintf(format, args...))
-	panic(err)
+	panic(NewKErr(funcCaller()+fmt.Sprintf(format, args...), err))
 }
 
 func MustNotError(err error) {
 	if err == nil {
 		return
 	}
-
-	_log(funcCaller() + err.Error())
-	panic(err)
+	panic(NewKErr(funcCaller(), err))
 }
 
 func NotNil(err error) {
 	if err == nil {
 		return
 	}
-	panic(err)
+	panic(NewKErr("", err))
 }
 
 func P(d ...interface{}) {
@@ -78,12 +66,4 @@ func _Try(fn func()) (err error) {
 		reflect.ValueOf(fn).Call([]reflect.Value{})
 	}()
 	return
-}
-
-func GetStacks() []string {
-	return _stacks
-}
-
-func LogStacks() {
-	fmt.Println(strings.Join(_stacks, "\n"))
 }
