@@ -29,6 +29,4 @@ func TestName(t *testing.T) {
 	_Try(func() {
 		NotNil(a1())
 	})
-
-	LogStacks()
 }

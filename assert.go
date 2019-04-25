@@ -11,7 +11,8 @@ const callDepth = 2
 
 func Bool(b bool, format string, args ...interface{}) {
 	if b {
-		panic(NewKErr(funcCaller()+fmt.Sprintf(format, args...), nil))
+		_e := fmt.Sprintf(format, args...)
+		panic(&KErr{_stacks: []string{funcCaller() + _e}, err: errors.New(_e)})
 	}
 }
 
@@ -19,21 +20,50 @@ func Err(err error, format string, args ...interface{}) {
 	if err == nil {
 		return
 	}
-	panic(NewKErr(funcCaller()+fmt.Sprintf(format, args...), err))
+	_s := funcCaller() + fmt.Sprintf(format, args...)
+	_ke := &KErr{_stacks: []string{_s}}
+	switch e := err.(type) {
+	case *KErr:
+		_ke.err = e.err
+		_ke._stacks = append(_ke._stacks, e._stacks...)
+	case error:
+		_ke.err = e
+	}
+
+	panic(_ke)
 }
 
 func MustNotError(err error) {
 	if err == nil {
 		return
 	}
-	panic(NewKErr(funcCaller(), err))
+
+	_s := funcCaller()
+	_ke := &KErr{_stacks: []string{_s}}
+	switch e := err.(type) {
+	case *KErr:
+		_ke.err = e.err
+		_ke._stacks = append(_ke._stacks, e._stacks...)
+	case error:
+		_ke.err = e
+	}
+	panic(_ke)
 }
 
 func NotNil(err error) {
 	if err == nil {
 		return
 	}
-	panic(NewKErr("", err))
+
+	_ke := &KErr{}
+	switch e := err.(type) {
+	case *KErr:
+		_ke.err = e.err
+		_ke._stacks = append(_ke._stacks, e._stacks...)
+	case error:
+		_ke.err = e
+	}
+	panic(_ke)
 }
 
 func P(d ...interface{}) {
@@ -46,20 +76,22 @@ func P(d ...interface{}) {
 
 var True = Bool
 
-func _Try(fn func()) (err error) {
-	True(fn == nil, "the func is nil")
+func _Try(fn func()) (err *KErr) {
+	Bool(fn == nil, "the func is nil")
 
 	_v := reflect.TypeOf(fn)
-	True(_v.Kind() != reflect.Func, "the params type(%s) is not func", _v.String())
+	Bool(_v.Kind() != reflect.Func, "the params type(%s) is not func", _v.String())
 
 	defer func() {
 		defer func() {
 			if r := recover(); r != nil {
 				switch d := r.(type) {
 				case error:
-					err = d
+					err = &KErr{err: d}
 				case string:
-					err = errors.New(d)
+					err = &KErr{err: errors.New(d)}
+				case *KErr:
+					err = d
 				}
 			}
 		}()

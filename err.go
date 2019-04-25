@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-func NewKErr(stack string, err error) *KErr {
-	return &KErr{_stacks: []string{stack}, err: err}
+func NewKErr(stack []string, err error) *KErr {
+	return &KErr{_stacks: stack, err: err}
 }
 
 type KErr struct {
