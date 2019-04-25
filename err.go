@@ -26,5 +26,5 @@ func (e *KErr) GetStacks() []string {
 }
 
 func (e *KErr) LogStacks() {
-	fmt.Println(strings.Join(e._stacks, "\n"))
+	fmt.Println(e.Error(), strings.Join(e._stacks, "\n"))
 }
