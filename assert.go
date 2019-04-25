@@ -17,7 +17,7 @@ func Bool(b bool, format string, args ...interface{}) {
 }
 
 func Err(err error, format string, args ...interface{}) {
-	if err == nil {
+	if reflect.ValueOf(err).IsNil() {
 		return
 	}
 	_s := funcCaller() + fmt.Sprintf(format, args...)
@@ -34,7 +34,7 @@ func Err(err error, format string, args ...interface{}) {
 }
 
 func MustNotError(err error) {
-	if err == nil {
+	if reflect.ValueOf(err).IsNil() {
 		return
 	}
 
@@ -51,7 +51,7 @@ func MustNotError(err error) {
 }
 
 func NotNil(err error) {
-	if err == nil {
+	if reflect.ValueOf(err).IsNil() {
 		return
 	}
 
