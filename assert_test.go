@@ -1,12 +1,13 @@
 package assert
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 )
 
 func a1() error {
 	return _Try(func() {
+		MustNotError(errors.New("sbhbhbh"))
 		Bool(true, "好东西%d", 1)
 	})
 }
@@ -17,15 +18,17 @@ func TestName(t *testing.T) {
 	P(IfEquals(0, ""))
 	P(IfEquals("", ""))
 
-	fmt.Println(_Try(func() {
+	_Try(func() {
 		Err(a1(), "ok111")
-	}))
+	})
 
-	fmt.Println(_Try(func() {
+	_Try(func() {
 		Err(a1(), "oo")
-	}))
+	})
 
-	fmt.Println(_Try(func() {
+	_Try(func() {
 		NotNil(a1())
-	}))
+	})
+
+	LogStacks()
 }

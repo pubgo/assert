@@ -59,26 +59,24 @@ func IfNotIn(a interface{}, args ...interface{}) bool {
 	return !IfIn(a, args...)
 }
 
-// FileExists checks whether a file exists in the given path. It also fails if the path points to a directory or there is an error when trying to check the file.
-func FileExists(path string, msgAndArgs ...interface{}) bool {
-	info, err := os.Lstat(path)
+func FileExists(path string) bool {
+	_, err := os.Lstat(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false
 		}
-		Err(err, "")
+		NotNil(err)
 	}
-	return info.IsDir()
+	return true
 }
 
-// DirExists checks whether a directory exists in the given path. It also fails if the path is a file rather a directory or there is an error checking whether it exists.
-func DirExists(path string, msgAndArgs ...interface{}) bool {
+func DirExists(path string) bool {
 	info, err := os.Lstat(path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return false
 		}
-		Err(err, "")
+		NotNil(err)
 	}
-	return !info.IsDir()
+	return info.IsDir()
 }

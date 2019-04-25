@@ -4,15 +4,22 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"reflect"
+	"strings"
 )
 
 const callDepth = 2
 
+var _stacks []string
+
+func _log(s string) {
+	_stacks = append(_stacks, s)
+}
+
 func Bool(b bool, format string, args ...interface{}) {
 	if b {
-		panic(funcCaller() + fmt.Sprintf(format, args...))
+		_log(funcCaller() + fmt.Sprintf(format, args...))
+		panic("")
 	}
 }
 
@@ -21,7 +28,7 @@ func Err(err error, format string, args ...interface{}) {
 		return
 	}
 
-	log.Print(funcCaller() + fmt.Sprintf(format, args...))
+	_log(funcCaller() + fmt.Sprintf(format, args...))
 	panic(err)
 }
 
@@ -30,7 +37,7 @@ func MustNotError(err error) {
 		return
 	}
 
-	log.Print(funcCaller())
+	_log(funcCaller() + err.Error())
 	panic(err)
 }
 
@@ -71,4 +78,12 @@ func _Try(fn func()) (err error) {
 		reflect.ValueOf(fn).Call([]reflect.Value{})
 	}()
 	return
+}
+
+func GetStacks() []string {
+	return _stacks
+}
+
+func LogStacks() {
+	fmt.Println(strings.Join(_stacks, "\n"))
 }
