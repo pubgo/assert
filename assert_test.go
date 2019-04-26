@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func a1() error {
+func a1() *KErr {
 	return _Try(func() {
 		MustNotError(errors.New("sbhbhbh"))
 		Bool(true, "好东西%d", 1)
@@ -20,13 +20,13 @@ func TestName(t *testing.T) {
 
 	_Try(func() {
 		Err(a1(), "ok111")
-	})
+	}).LogStacks()
 
 	_Try(func() {
 		Err(a1(), "oo")
-	})
+	}).LogStacks()
 
 	_Try(func() {
 		NotNil(a1())
-	})
+	}).LogStacks()
 }

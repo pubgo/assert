@@ -9,60 +9,48 @@ import (
 
 const callDepth = 2
 
+var MaxStack = 10000
+
 func Bool(b bool, format string, args ...interface{}) {
 	if b {
 		_e := fmt.Sprintf(format, args...)
-		panic(&KErr{_stacks: []string{funcCaller() + _e}, err: errors.New(_e)})
+
+		_ke := NewKErr()
+		_ke.AddStack(funcCaller() + _e)
+		_ke.SetErr(errors.New(_e))
+		panic(_ke)
 	}
 }
 
 func Err(err error, format string, args ...interface{}) {
-	if reflect.ValueOf(err).IsNil() {
+	if !reflect.ValueOf(err).IsValid() || reflect.ValueOf(err).IsNil() {
 		return
 	}
-	_s := funcCaller() + fmt.Sprintf(format, args...)
-	_ke := &KErr{_stacks: []string{_s}}
-	switch e := err.(type) {
-	case *KErr:
-		_ke.err = e.err
-		_ke._stacks = append(_ke._stacks, e._stacks...)
-	case error:
-		_ke.err = e
-	}
 
+	_ke := NewKErr()
+	_ke.AddStack(funcCaller() + fmt.Sprintf(format, args...))
+	_ke.SetErr(err)
 	panic(_ke)
 }
 
 func MustNotError(err error) {
-	if reflect.ValueOf(err).IsNil() {
+	if !reflect.ValueOf(err).IsValid() || reflect.ValueOf(err).IsNil() {
 		return
 	}
 
-	_s := funcCaller()
-	_ke := &KErr{_stacks: []string{_s}}
-	switch e := err.(type) {
-	case *KErr:
-		_ke.err = e.err
-		_ke._stacks = append(_ke._stacks, e._stacks...)
-	case error:
-		_ke.err = e
-	}
+	_ke := NewKErr()
+	_ke.AddStack(funcCaller() + err.Error())
+	_ke.SetErr(err)
 	panic(_ke)
 }
 
 func NotNil(err error) {
-	if reflect.ValueOf(err).IsNil() {
+	if !reflect.ValueOf(err).IsValid() || reflect.ValueOf(err).IsNil() {
 		return
 	}
 
-	_ke := &KErr{}
-	switch e := err.(type) {
-	case *KErr:
-		_ke.err = e.err
-		_ke._stacks = append(_ke._stacks, e._stacks...)
-	case error:
-		_ke.err = e
-	}
+	_ke := NewKErr()
+	_ke.SetErr(err)
 	panic(_ke)
 }
 
@@ -86,12 +74,12 @@ func _Try(fn func()) (err *KErr) {
 		defer func() {
 			if r := recover(); r != nil {
 				switch d := r.(type) {
+				case *KErr:
+					err = d
 				case error:
 					err = &KErr{err: d}
 				case string:
 					err = &KErr{err: errors.New(d)}
-				case *KErr:
-					err = d
 				}
 			}
 		}()
