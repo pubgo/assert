@@ -41,6 +41,10 @@ func (e *KErr) Error() string {
 	return ""
 }
 
+func (e *KErr) IsNil() bool {
+	return e.err == nil
+}
+
 func (e *KErr) GetStacks() (stack []string) {
 	close(e._stacks)
 	for s := range e._stacks {
