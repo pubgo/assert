@@ -10,11 +10,13 @@ import (
 )
 
 var goPath = build.Default.GOPATH
-var srcDir = filepath.Join(goPath, "src")
+var srcDir = fmt.Sprintf("%s%s", filepath.Join(goPath, "src"), string(os.PathSeparator))
+var modDir = fmt.Sprintf("%s%s", filepath.Join(goPath, "pkg", "mod"), string(os.PathSeparator))
 
 func funcCaller() string {
 	_, file, line, _ := runtime.Caller(callDepth)
-	return strings.TrimPrefix(fmt.Sprintf("%s:%d ", file, line), fmt.Sprintf("%s%s", srcDir, string(os.PathSeparator)))
+	_f := fmt.Sprintf("%s:%d ", file, line)
+	return strings.TrimPrefix(strings.TrimPrefix(_f, srcDir), modDir)
 }
 
 func If(b bool, t, f interface{}) interface{} {
