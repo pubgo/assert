@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strings"
 )
 
 var goPath = build.Default.GOPATH
@@ -16,7 +15,8 @@ var modDir = fmt.Sprintf("%s%s", filepath.Join(goPath, "pkg", "mod"), string(os.
 func funcCaller() string {
 	_, file, line, _ := runtime.Caller(callDepth)
 	_f := fmt.Sprintf("%s:%d ", file, line)
-	return strings.TrimPrefix(strings.TrimPrefix(_f, srcDir), modDir)
+	//return strings.TrimPrefix(strings.TrimPrefix(_f, srcDir), modDir)
+	return _f
 }
 
 func If(b bool, t, f interface{}) interface{} {
