@@ -35,10 +35,11 @@ func (e *KErr) AddStack(stack string) {
 }
 
 func (e *KErr) Error() string {
-	if e.err != nil {
-		return e.err.Error()
+	if e.IsNil() {
+		return ""
 	}
-	return ""
+
+	return e.err.Error()
 }
 
 func (e *KErr) IsNil() bool {
@@ -47,6 +48,11 @@ func (e *KErr) IsNil() bool {
 
 func (e *KErr) GetStacks() (stack []string) {
 	close(e._stacks)
+
+	if e.IsNil() {
+		return
+	}
+
 	for s := range e._stacks {
 		stack = append(stack, s)
 	}
@@ -54,7 +60,12 @@ func (e *KErr) GetStacks() (stack []string) {
 }
 
 func (e *KErr) LogStacks() {
-	fmt.Println("error: ", e.Error())
+
+	if e.IsNil() {
+		return
+	}
+
 	fmt.Println(strings.Join(e.GetStacks(), "\n"))
-	fmt.Println()
+	fmt.Println("error: ", e.Error())
+	fmt.Println("************************")
 }
