@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"reflect"
 )
 
@@ -18,7 +19,7 @@ func Bool(b bool, format string, args ...interface{}) {
 		_ke := NewKErr()
 		_ke.AddStack(funcCaller() + _e)
 		_ke.SetErr(errors.New(_e))
-		panic(_ke)
+		_ke.Panic()
 	}
 }
 
@@ -27,10 +28,14 @@ func Err(err error, format string, args ...interface{}) {
 		return
 	}
 
+	if isNil(err) {
+		return
+	}
+
 	_ke := NewKErr()
 	_ke.AddStack(funcCaller() + fmt.Sprintf(format, args...))
 	_ke.SetErr(err)
-	panic(_ke)
+	_ke.Panic()
 }
 
 func MustNotError(err error) {
@@ -38,10 +43,14 @@ func MustNotError(err error) {
 		return
 	}
 
+	if isNil(err) {
+		return
+	}
+
 	_ke := NewKErr()
 	_ke.AddStack(funcCaller() + err.Error())
 	_ke.SetErr(err)
-	panic(_ke)
+	_ke.Panic()
 }
 
 func NotNil(err error) {
@@ -49,41 +58,24 @@ func NotNil(err error) {
 		return
 	}
 
+	if isNil(err) {
+		return
+	}
+
 	_ke := NewKErr()
 	_ke.SetErr(err)
-	panic(_ke)
+	_ke.Panic()
 }
 
 func P(d ...interface{}) {
 	for _, i := range d {
-		dt, err := json.MarshalIndent(i, "", "\t")
-		MustNotError(err)
-		fmt.Println(reflect.ValueOf(i).String(), "->", string(dt))
+		if dt, err := json.MarshalIndent(i, "", "\t"); err != nil {
+			panic(err)
+		} else {
+			log.Println(reflect.ValueOf(i).String(), "->", string(dt))
+		}
+
 	}
 }
 
 var True = Bool
-
-func _Try(fn func()) (err *KErr) {
-	Bool(fn == nil, "the func is nil")
-
-	_v := reflect.TypeOf(fn)
-	Bool(_v.Kind() != reflect.Func, "the params type(%s) is not func", _v.String())
-
-	defer func() {
-		defer func() {
-			if r := recover(); r != nil {
-				switch d := r.(type) {
-				case *KErr:
-					err = d
-				case error:
-					err = &KErr{err: d}
-				case string:
-					err = &KErr{err: errors.New(d)}
-				}
-			}
-		}()
-		reflect.ValueOf(fn).Call([]reflect.Value{})
-	}()
-	return
-}
