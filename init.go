@@ -6,25 +6,13 @@ import (
 	"reflect"
 )
 
-func isNil(err error) bool {
-	switch _e := err.(type) {
-	case *KErr:
-		return _e.err == nil
-	case error:
-		return _e == nil
-	default:
-		panic("unknown type")
-	}
-	return true
-}
-
 func Type(err interface{}) {
 	P(err)
 	fmt.Println(reflect.TypeOf(err).String(), funcCaller())
 	fmt.Println("******************************")
 }
 
-func _Try(fn func()) (err *KErr) {
+func _Try(fn func()) (err error) {
 	Bool(fn == nil, "the func is nil")
 
 	_v := reflect.TypeOf(fn)
@@ -32,18 +20,25 @@ func _Try(fn func()) (err *KErr) {
 
 	defer func() {
 		defer func() {
+			m := &KErr{}
 			if r := recover(); r != nil {
 				switch d := r.(type) {
 				case *KErr:
-					err = d
+					m = d
 				case error:
-					err.SetErr(d)
+					m.Sub = d
 				case string:
-					err.SetErr(errors.New(d))
+					m.Sub = errors.New(d)
 				}
 			}
+
+			if m.Sub == nil {
+				err = nil
+			} else {
+				err = m
+			}
 		}()
-		fn()
+		reflect.ValueOf(fn).Call([]reflect.Value{})
 	}()
-	return nil
+	return
 }

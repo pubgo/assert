@@ -27,6 +27,13 @@ func If(b bool, t, f interface{}) interface{} {
 	return f
 }
 
+func IfNil(b interface{}, t, f interface{}) interface{} {
+	if b == t {
+		return f
+	}
+	return b
+}
+
 func IfEquals(args ...interface{}) bool {
 	if len(args) == 0 {
 		return true
@@ -68,7 +75,7 @@ func FileExists(path string) bool {
 		if os.IsNotExist(err) {
 			return false
 		}
-		NotNil(err)
+		Err(err)
 	}
 	return true
 }
@@ -79,7 +86,7 @@ func DirExists(path string) bool {
 		if os.IsNotExist(err) {
 			return false
 		}
-		NotNil(err)
+		Err(err)
 	}
 	return info.IsDir()
 }
