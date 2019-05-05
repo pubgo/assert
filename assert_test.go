@@ -1,12 +1,13 @@
 package assert
 
 import (
+	"errors"
 	"testing"
 )
 
 func a1() error {
 	return _Try(func() {
-		Err(ErrOf("sbhbhbh"))
+		Err(errors.New("sbhbhbh"))
 		Bool(true, "好东西%d", 1)
 	})
 }

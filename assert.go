@@ -32,13 +32,15 @@ func ErrWrap(err error, format string, args ...interface{}) {
 	case *KErr:
 		m = e
 	case error:
-		m.Msg = e.Error()
+		m.Msg=e.Error()
+		m.Err=e
 	}
 
 	panic(&KErr{
 		Sub:        m,
 		FuncCaller: funcCaller(),
 		Msg:        fmt.Sprintf(format, args...),
+		Err:        m.tErr(),
 	})
 }
 
@@ -52,12 +54,14 @@ func Err(err error) {
 	case *KErr:
 		m = e
 	case error:
-		m.Msg = e.Error()
+		m.Err=e
+		m.Msg=e.Error()
 	}
 
 	panic(&KErr{
 		Sub:        m,
 		FuncCaller: funcCaller(),
+		Err:        m.tErr(),
 	})
 }
 

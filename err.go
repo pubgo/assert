@@ -7,12 +7,19 @@ import (
 type KErr struct {
 	Msg        string `json:"msg,omitempty"`
 	FuncCaller string `json:"funcCaller,omitempty"`
-	Sub        error  `json:"sub,omitempty"`
+	Sub        *KErr  `json:"sub,omitempty"`
+	Err        error  `json:"err,omitempty"`
 }
 
 func (t *KErr) Error() string {
 	_dt, _ := json.Marshal(t)
 	return string(_dt)
+}
+
+func (t *KErr) tErr() ( err error) {
+	err =t.Err
+	t.Err=nil
+	return
 }
 
 func (t *KErr) Panic() {

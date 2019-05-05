@@ -1,7 +1,6 @@
 package assert
 
 import (
-	"errors"
 	"fmt"
 	"reflect"
 )
@@ -25,10 +24,6 @@ func _Try(fn func()) (err error) {
 				switch d := r.(type) {
 				case *KErr:
 					m = d
-				case error:
-					m.Sub = d
-				case string:
-					m.Sub = errors.New(d)
 				}
 			}
 
