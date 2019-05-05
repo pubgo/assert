@@ -17,10 +17,7 @@ func ErrOf(msg string, args ...interface{}) *KErr {
 
 func Bool(b bool, format string, args ...interface{}) {
 	if b {
-		panic(&KErr{
-			FuncCaller: funcCaller(),
-			Msg:        fmt.Sprintf(format, args...),
-		})
+		panic(ErrOf(format, args...))
 	}
 }
 
