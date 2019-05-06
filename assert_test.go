@@ -7,7 +7,7 @@ import (
 
 func a1() error {
 	return _Try(func() {
-		Err(errors.New("sbhbhbh"))
+		ErrWrap(errors.New("sbhbhbh"),"test shhh")
 		Bool(true, "好东西%d", 1)
 	})
 }

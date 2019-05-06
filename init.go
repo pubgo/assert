@@ -24,10 +24,14 @@ func _Try(fn func()) (err error) {
 				switch d := r.(type) {
 				case *KErr:
 					m = d
+				case error:
+					m.Err = d
+				default:
+					panic("type error, must be *KErr type")
 				}
 			}
 
-			if m.Sub == nil {
+			if m.Err == nil {
 				err = nil
 			} else {
 				err = m
