@@ -15,9 +15,12 @@ func ErrOf(msg string, args ...interface{}) *KErr {
 	}
 }
 
-func Bool(b bool, format string, args ...interface{}) {
+func Bool(b bool, msg string, args ...interface{}) {
 	if b {
-		panic(ErrOf(format, args...))
+		panic(&KErr{
+			FuncCaller: funcCaller(),
+			Msg:        fmt.Sprintf(msg, args...),
+		})
 	}
 }
 
