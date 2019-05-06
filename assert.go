@@ -2,6 +2,7 @@ package assert
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 )
@@ -9,17 +10,21 @@ import (
 const callDepth = 2
 
 func ErrOf(msg string, args ...interface{}) *KErr {
+	_msg := fmt.Sprintf(msg, args...)
 	return &KErr{
 		FuncCaller: funcCaller(),
-		Msg:        fmt.Sprintf(msg, args...),
+		Msg:        _msg,
+		Err:        errors.New(_msg),
 	}
 }
 
 func Bool(b bool, msg string, args ...interface{}) {
 	if b {
+		_msg := fmt.Sprintf(msg, args...)
 		panic(&KErr{
 			FuncCaller: funcCaller(),
-			Msg:        fmt.Sprintf(msg, args...),
+			Msg:        _msg,
+			Err:        errors.New(_msg),
 		})
 	}
 }
