@@ -12,6 +12,10 @@ type KErr struct {
 }
 
 func (t *KErr) Error() string {
+	return t.Err.Error()
+}
+
+func (t *KErr) StackTrace() string {
 	_dt, _ := json.Marshal(t)
 	return string(_dt)
 }
