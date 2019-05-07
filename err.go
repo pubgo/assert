@@ -16,9 +16,9 @@ func (t *KErr) Error() string {
 	return string(_dt)
 }
 
-func (t *KErr) tErr() ( err error) {
-	err =t.Err
-	t.Err=nil
+func (t *KErr) tErr() (err error) {
+	err = t.Err
+	t.Err = nil
 	return
 }
 

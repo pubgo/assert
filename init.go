@@ -1,15 +1,8 @@
 package assert
 
 import (
-	"fmt"
 	"reflect"
 )
-
-func Type(err interface{}) {
-	P(err)
-	fmt.Println(reflect.TypeOf(err).String(), funcCaller())
-	fmt.Println("******************************")
-}
 
 func _Try(fn func()) (err error) {
 	Bool(fn == nil, "the func is nil")
@@ -26,6 +19,7 @@ func _Try(fn func()) (err error) {
 					m = d
 				case error:
 					m.Err = d
+					m.Msg = d.Error()
 				default:
 					panic("type error, must be *KErr type")
 				}

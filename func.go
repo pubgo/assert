@@ -2,7 +2,6 @@ package assert
 
 import (
 	"fmt"
-	"os"
 	"runtime"
 )
 
@@ -25,13 +24,6 @@ func If(b bool, t, f interface{}) interface{} {
 		return t
 	}
 	return f
-}
-
-func IfNil(b interface{}, t, f interface{}) interface{} {
-	if b == t {
-		return f
-	}
-	return b
 }
 
 func IfEquals(args ...interface{}) bool {
@@ -67,26 +59,4 @@ func IfIn(a interface{}, args ...interface{}) bool {
 
 func IfNotIn(a interface{}, args ...interface{}) bool {
 	return !IfIn(a, args...)
-}
-
-func FileExists(path string) bool {
-	_, err := os.Lstat(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-		Err(err)
-	}
-	return true
-}
-
-func DirExists(path string) bool {
-	info, err := os.Lstat(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-		Err(err)
-	}
-	return info.IsDir()
 }

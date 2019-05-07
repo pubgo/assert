@@ -7,7 +7,7 @@ import (
 
 func a1() error {
 	return _Try(func() {
-		ErrWrap(errors.New("sbhbhbh"),"test shhh")
+		ErrWrap(errors.New("sbhbhbh"), "test shhh")
 		Bool(true, "好东西%d", 1)
 	})
 }
@@ -25,8 +25,4 @@ func TestName(t *testing.T) {
 			}), "test 123")
 		}))
 	}))
-}
-
-func TestIfNil(t *testing.T) {
-	t.Log(IfNil(nil, nil, "test").(string))
 }
