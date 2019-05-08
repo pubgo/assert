@@ -2,7 +2,6 @@ package assert
 
 import (
 	"log"
-	"reflect"
 	"runtime"
 	"time"
 )
@@ -16,8 +15,8 @@ func NewTask(max int, maxDur time.Duration) *task {
 }
 
 func FuncOf(fn interface{}, efn func(err error)) TaskFn {
-	t := reflect.TypeOf(fn)
-	ST(t.Kind() != reflect.Func, "the params is not func type")
+	assertFn(fn)
+	assertFn(efn)
 
 	return func(args ...interface{}) *_task_fn {
 		return &_task_fn{
@@ -35,9 +34,7 @@ type _task_fn struct {
 }
 
 func (t *_task_fn) _do() {
-	if err := KTry(func() {
-		FnOf(t.fn, t.args...)()
-	}).(*KErr); err != nil {
+	if err := KTry(t.fn, t.args...).(*KErr); err != nil {
 		if t.efn != nil {
 			t.efn(err)
 		}

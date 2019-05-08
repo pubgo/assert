@@ -13,20 +13,21 @@ func assertFn(fn interface{}) {
 	ST(_v.Kind() != reflect.Func, "the params(%s) is not func type", _v.String())
 }
 
-func Try(fn func()) (r interface{}) {
+func Try(fn interface{}, args ...interface{}) (r interface{}) {
 	defer func() {
 		defer func() {
 			r = recover()
 		}()
-		reflect.ValueOf(fn).Call([]reflect.Value{})
+		FnOf(fn, args...)()
 	}()
+
 	assertFn(fn)
 	return
 }
 
-func KTry(fn func()) (err error) {
+func KTry(fn interface{}, args ...interface{}) (err error) {
 	m := &KErr{}
-	if r := Try(fn); r != nil {
+	if r := Try(fn, args...); r != nil {
 		switch d := r.(type) {
 		case *KErr:
 			m = d
