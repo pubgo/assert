@@ -23,7 +23,13 @@ func (t *M) Tag(tag string) {
 	t.tag = tag
 }
 
-func True(b bool, fn func(m *M)) {
+func ST(b bool, msg string, args ...interface{}) {
+	T(b, func(m *M) {
+		m.Msg(msg, args...)
+	})
+}
+
+func T(b bool, fn func(m *M)) {
 	if b {
 		_m := &M{M: make(map[string]interface{})}
 		fn(_m)
@@ -74,6 +80,12 @@ func ErrWrap(err error, fn func(m *M)) {
 		Err:    m.tErr(),
 		Tag:    _tag,
 		M:      _m.M,
+	})
+}
+
+func SWrap(err error, msg string, args ...interface{}) {
+	ErrWrap(err, func(m *M) {
+		m.Msg(msg, args...)
 	})
 }
 
