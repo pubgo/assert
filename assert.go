@@ -9,27 +9,40 @@ import (
 
 const callDepth = 2
 
-func ErrOf(msg string, args ...interface{}) *KErr {
-	_msg := fmt.Sprintf(msg, args...)
-	return &KErr{
-		FuncCaller: funcCaller(),
-		Msg:        _msg,
-		Err:        errors.New(_msg),
-	}
+type M struct {
+	msg string
+	tag string
+	M   map[string]interface{}
 }
 
-func Bool(b bool, msg string, args ...interface{}) {
+func (t *M) Msg(format string, args ...interface{}) {
+	t.msg = fmt.Sprintf(format, args...)
+}
+
+func (t *M) Tag(tag string) {
+	t.tag = tag
+}
+
+func True(b bool, fn func(m *M)) {
 	if b {
-		_msg := fmt.Sprintf(msg, args...)
+		_m := &M{M: make(map[string]interface{})}
+		fn(_m)
+
+		if len(_m.M) == 0 {
+			_m.M = nil
+		}
+
 		panic(&KErr{
-			FuncCaller: funcCaller(),
-			Msg:        _msg,
-			Err:        errors.New(_msg),
+			Caller: funcCaller(),
+			Msg:    _m.msg,
+			Err:    errors.New(_m.msg),
+			Tag:    _m.tag,
+			M:      _m.M,
 		})
 	}
 }
 
-func ErrWrap(err error, format string, args ...interface{}) {
+func ErrWrap(err error, fn func(m *M)) {
 
 	if err == nil {
 		return
@@ -44,15 +57,27 @@ func ErrWrap(err error, format string, args ...interface{}) {
 		m.Err = e
 	}
 
+	_m := &M{M: make(map[string]interface{})}
+	fn(_m)
+
+	var _tag = If(_m.tag == "", m.Tag, _m.tag).(string)
+	m.Tag = ""
+
+	if len(_m.M) == 0 {
+		_m.M = nil
+	}
+
 	panic(&KErr{
-		Sub:        m,
-		FuncCaller: funcCaller(),
-		Msg:        fmt.Sprintf(format, args...),
-		Err:        m.tErr(),
+		Sub:    m,
+		Caller: funcCaller(),
+		Msg:    _m.msg,
+		Err:    m.tErr(),
+		Tag:    _tag,
+		M:      _m.M,
 	})
 }
 
-func Err(err error) {
+func Throw(err error) {
 	if err == nil {
 		return
 	}
@@ -66,10 +91,14 @@ func Err(err error) {
 		m.Msg = e.Error()
 	}
 
+	var _tag = m.Tag
+	m.Tag = ""
+
 	panic(&KErr{
-		Sub:        m,
-		FuncCaller: funcCaller(),
-		Err:        m.tErr(),
+		Sub:    m,
+		Caller: funcCaller(),
+		Err:    m.tErr(),
+		Tag:    _tag,
 	})
 }
 
@@ -86,5 +115,3 @@ func P(d ...interface{}) {
 		}
 	}
 }
-
-var True = Bool

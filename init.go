@@ -5,10 +5,14 @@ import (
 )
 
 func _Try(fn func()) (err error) {
-	Bool(fn == nil, "the func is nil")
+	True(fn == nil, func(m *M) {
+		m.Msg("the func is nil")
+	})
 
 	_v := reflect.TypeOf(fn)
-	Bool(_v.Kind() != reflect.Func, "the params type(%s) is not func", _v.String())
+	True(_v.Kind() != reflect.Func, func(m *M) {
+		m.Msg("the params type(%s) is not func", _v.String())
+	})
 
 	defer func() {
 		defer func() {

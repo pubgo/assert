@@ -5,10 +5,12 @@ import (
 )
 
 type KErr struct {
-	Msg        string `json:"msg,omitempty"`
-	FuncCaller string `json:"funcCaller,omitempty"`
-	Sub        *KErr  `json:"sub,omitempty"`
-	Err        error  `json:"err,omitempty"`
+	Tag    string                 `json:"tag,omitempty"`
+	M      map[string]interface{} `json:"m,omitempty"`
+	Err    error                  `json:"err,omitempty"`
+	Msg    string                 `json:"msg,omitempty"`
+	Caller string                 `json:"caller,omitempty"`
+	Sub    *KErr                  `json:"sub,omitempty"`
 }
 
 func (t *KErr) Error() string {
