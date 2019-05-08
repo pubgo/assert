@@ -5,12 +5,12 @@ import (
 )
 
 func _Try(fn func()) (err error) {
-	True(fn == nil, func(m *M) {
+	T(fn == nil, func(m *M) {
 		m.Msg("the func is nil")
 	})
 
 	_v := reflect.TypeOf(fn)
-	True(_v.Kind() != reflect.Func, func(m *M) {
+	T(_v.Kind() != reflect.Func, func(m *M) {
 		m.Msg("the params type(%s) is not func", _v.String())
 	})
 

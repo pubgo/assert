@@ -13,7 +13,7 @@ func a1() error {
 			m.M["input"] = 1
 		})
 
-		True(true, func(m *M) {
+		T(true, func(m *M) {
 			m.Msg("好东西%d", 1)
 		})
 	})
