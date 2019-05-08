@@ -24,9 +24,14 @@ func (t *M) Tag(tag string) {
 }
 
 func ST(b bool, msg string, args ...interface{}) {
-	T(b, func(m *M) {
-		m.Msg(msg, args...)
-	})
+	if b {
+		_m := fmt.Sprintf(msg, args...)
+		panic(&KErr{
+			Caller: funcCaller(),
+			Msg:    _m,
+			Err:    errors.New(_m),
+		})
+	}
 }
 
 func T(b bool, fn func(m *M)) {
@@ -84,8 +89,25 @@ func ErrWrap(err error, fn func(m *M)) {
 }
 
 func SWrap(err error, msg string, args ...interface{}) {
-	ErrWrap(err, func(m *M) {
-		m.Msg(msg, args...)
+	if err == nil {
+		return
+	}
+
+	var m = &KErr{}
+	switch e := err.(type) {
+	case *KErr:
+		m = e
+	case error:
+		m.Msg = e.Error()
+		m.Err = e
+	}
+
+	_m := fmt.Sprintf(msg, args...)
+	panic(&KErr{
+		Sub:    m,
+		Caller: funcCaller(),
+		Msg:    _m,
+		Err:    m.tErr(),
 	})
 }
 

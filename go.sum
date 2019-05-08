@@ -1,7 +1,0 @@
-github.com/juju/errors v0.0.0-20190207033735-e65537c515d7 h1:dMIPRDg6gi7CUp0Kj2+HxqJ5kTr1iAdzsXYIrLCNSmU=
-github.com/juju/errors v0.0.0-20190207033735-e65537c515d7/go.mod h1:W54LbzXuIE0boCoNJfwqpmkKJ1O4TCTZMetAt6jGk7Q=
-github.com/kooksee/go-assert v0.0.0-20190325070004-fa7e623e7daf h1:Y0zqSQ5wyp2pN1Fw3Q5UYRPEsay27sCP+gxPq5ROC8w=
-github.com/kooksee/go-assert v0.0.0-20190325070004-fa7e623e7daf/go.mod h1:vg3RAOxaCHvcIFm4Tp3d0An7csmAbEh8XGbsi1oNuWk=
-github.com/pubgo/assert v0.0.3/go.mod h1:QV8B3QTgu6t/sys9UZOHhCSBtXm/NR2qrn74yPUpgi4=
-github.com/pubgo/gotry v0.0.9 h1:d0GLCWDALIt2U+PgOpKz9IneNcKSZwa3dw/7sLL3yYI=
-github.com/pubgo/gotry v0.0.9/go.mod h1:ebMbfJ6vIbeYMswERB6KHLukUP4Qmtvohw5S7Dr/aEo=

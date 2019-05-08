@@ -2,11 +2,13 @@ package assert
 
 import (
 	"errors"
+	"fmt"
+	"reflect"
 	"testing"
 )
 
 func a1() error {
-	return _Try(func() {
+	return KTry(func() {
 		ErrWrap(errors.New("sbhbhbh"), func(m *M) {
 			m.Msg("test shhh")
 			m.M["ss"] = 1
@@ -25,9 +27,11 @@ func TestName(t *testing.T) {
 	P(IfEquals(0, ""))
 	P(IfEquals("", ""))
 
-	P(_Try(func() {
-		Throw(_Try(func() {
-			ErrWrap(_Try(func() {
+	fmt.Println(IsNil(a1()))
+
+	P(KTry(func() {
+		Throw(KTry(func() {
+			ErrWrap(KTry(func() {
 				ErrWrap(a1(), func(m *M) {
 					m.Msg("ok111")
 					m.Tag("test tag")
@@ -37,4 +41,29 @@ func TestName(t *testing.T) {
 			})
 		}))
 	}))
+}
+
+func TestType(t *testing.T) {
+	var ss map[string]interface{}
+	var s interface{}
+	for _, i := range ObjOf("1", 0, errors.New(""), nil, []string{}, ss, s) {
+		fmt.Println(IsNil(i))
+	}
+}
+
+func TestTry(t *testing.T) {
+	P(Try(func() {
+		ST(true, "sss")
+	}))
+
+	P(KTry(func() {
+		ST(true, "sss")
+	}))
+}
+
+func TestIf(t *testing.T) {
+	fmt.Println(If(true, 1, "ss").(int))
+	fmt.Println(If(true, FnOf(ToInt, "2"), "ss").(int))
+	fmt.Println(If(true, FnOf(ToInt, "2"), "ss").(int))
+	fmt.Println(reflect.TypeOf(FnOf(ToInt, "2")).Name())
 }
