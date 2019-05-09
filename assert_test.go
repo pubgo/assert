@@ -67,3 +67,8 @@ func TestIf(t *testing.T) {
 	fmt.Println(If(true, FnOf(ToInt, "2"), "ss").(int))
 	fmt.Println(reflect.TypeOf(FnOf(ToInt, "2")).Name())
 }
+func TestTask(t *testing.T) {
+	var ss interface{}
+	sss, ok := ss.(FnT)
+	fmt.Println(sss, ok)
+}

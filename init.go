@@ -1,51 +1,39 @@
 package assert
 
 import (
-	"errors"
 	"fmt"
+	"go/build"
+	"os"
+	"path/filepath"
 	"reflect"
+	"runtime"
+	"strings"
 )
+
+func fibonacci() func() int {
+	a1, a2 := 0, 1
+	return func() int {
+		a1, a2 = a2, a1+a2
+		return a1
+	}
+}
 
 func assertFn(fn interface{}) {
 	ST(IsNil(fn), "the func is nil")
 
 	_v := reflect.TypeOf(fn)
-	ST(_v.Kind() != reflect.Func, "the params(%s) is not func type", _v.String())
+	ST(_v.Kind() != reflect.Func, "func type error(%s)", _v.String())
 }
 
-func Try(fn interface{}, args ...interface{}) (r interface{}) {
-	defer func() {
-		defer func() {
-			r = recover()
-		}()
-		FnOf(fn, args...)()
-	}()
+var goPath = build.Default.GOPATH
+var srcDir = fmt.Sprintf("%s%s", filepath.Join(goPath, "src"), string(os.PathSeparator))
+var modDir = fmt.Sprintf("%s%s", filepath.Join(goPath, "pkg", "mod"), string(os.PathSeparator))
 
-	assertFn(fn)
-	return
-}
-
-func KTry(fn interface{}, args ...interface{}) (err error) {
-	m := &KErr{}
-	if r := Try(fn, args...); r != nil {
-		switch d := r.(type) {
-		case *KErr:
-			m = d
-		case error:
-			m.Err = d
-			m.Msg = d.Error()
-		case string:
-			m.Err = errors.New(d)
-			m.Msg = d
-		default:
-			panic(fmt.Sprintf("type error %v", d))
-		}
+func funcCaller() string {
+	_, file, line, ok := runtime.Caller(callDepth)
+	if !ok {
+		return "no func caller"
 	}
 
-	if m.Err == nil {
-		err = nil
-	} else {
-		err = m
-	}
-	return
+	return strings.TrimPrefix(strings.TrimPrefix(fmt.Sprintf("%s:%d ", file, line), srcDir), modDir)
 }

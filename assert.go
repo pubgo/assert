@@ -138,7 +138,7 @@ func Throw(err error) {
 
 func P(d ...interface{}) {
 	for _, i := range d {
-		if i == nil {
+		if IsNil(i) {
 			continue
 		}
 

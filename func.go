@@ -1,28 +1,13 @@
 package assert
 
 import (
-	"fmt"
 	"reflect"
-	"runtime"
 	"strconv"
 	"time"
 )
 
-//var goPath = build.Default.GOPATH
-//var srcDir = fmt.Sprintf("%s%s", filepath.Join(goPath, "src"), string(os.PathSeparator))
-//var modDir = fmt.Sprintf("%s%s", filepath.Join(goPath, "pkg", "mod"), string(os.PathSeparator))
-
-func funcCaller() string {
-	_, file, line, ok := runtime.Caller(callDepth)
-	if !ok {
-		return "no func caller"
-	}
-
-	//return strings.TrimPrefix(strings.TrimPrefix(_f, srcDir), modDir)
-	return fmt.Sprintf("%s:%d ", file, line)
-}
-
 func If(b bool, t, f interface{}) interface{} {
+
 	if b {
 		if _t, ok := t.(FnT); ok {
 			return _t()[0].Interface()
@@ -120,14 +105,6 @@ func FnCost(f func()) time.Duration {
 	return time.Now().Sub(t1)
 }
 
-func fibonacci() func() int {
-	a1, a2 := 0, 1
-	return func() int {
-		a1, a2 = a2, a1+a2
-		return a1
-	}
-}
-
 func Retry(num int, fn func()) (err error) {
 	_t := fibonacci()
 	for i := 0; i < num; i++ {
@@ -178,4 +155,33 @@ func Ticker(fn func(dur time.Time) time.Duration) {
 
 		time.Sleep(_dur)
 	}
+}
+
+type FnT func() []reflect.Value
+
+func FnOf(fn interface{}, args ...interface{}) FnT {
+	assertFn(fn)
+
+	t := reflect.ValueOf(fn)
+	return func() []reflect.Value {
+		var vs []reflect.Value
+		for i, p := range args {
+			var _v reflect.Value
+			if IsNil(p) {
+				if t.Type().IsVariadic() {
+					i = 0
+				}
+				_v = reflect.New(t.Type().In(i)).Elem()
+			} else {
+				_v = reflect.ValueOf(p)
+			}
+
+			vs = append(vs, _v)
+		}
+		return t.Call(vs)
+	}
+}
+
+func AssertFn(fn interface{}) {
+	assertFn(fn)
 }

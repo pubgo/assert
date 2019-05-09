@@ -10,42 +10,33 @@ func ObjOf(args ...interface{}) []interface{} {
 	return args
 }
 
-func IsNil(p interface{}) (b bool) {
-	defer func() {
-		defer func() {
-			if err := recover(); err != nil {
-				b = false
-			}
-		}()
+func IsPtr(p interface{}) bool {
+	if IsNil(p) {
+		return false
+	}
 
-		if !reflect.ValueOf(p).IsValid() {
-			b = true
-			return
-		}
-
-		b = reflect.ValueOf(p).IsNil()
-	}()
-	return
+	return reflect.TypeOf(p).Kind() == reflect.Ptr
 }
 
-type FnT func() []reflect.Value
-
-func FnOf(fn interface{}, args ...interface{}) FnT {
-	assertFn(fn)
-
-	t := reflect.ValueOf(fn)
-	return func() []reflect.Value {
-		var vs []reflect.Value
-		for i, p := range args {
-			if IsNil(p) {
-				if t.Type().IsVariadic() {
-					i = 0
-				}
-				vs = append(vs, reflect.New(t.Type().In(i)).Elem())
-			} else {
-				vs = append(vs, reflect.ValueOf(p))
-			}
-		}
-		return t.Call(vs)
+func IsErr(p interface{}) bool {
+	if IsNil(p) {
+		return false
 	}
+
+	_, ok := p.(error)
+	return ok
+}
+
+func IsNil(p interface{}) (b bool) {
+	defer func() {
+		if err := recover(); err != nil {
+			b = false
+		}
+	}()
+
+	if !reflect.ValueOf(p).IsValid() {
+		return true
+	}
+
+	return reflect.ValueOf(p).IsNil()
 }

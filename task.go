@@ -14,7 +14,7 @@ func NewTask(max int, maxDur time.Duration) *task {
 	return _t
 }
 
-func FuncOf(fn interface{}, efn func(err error)) TaskFn {
+func TaskOf(fn interface{}, efn func(err error)) TaskFn {
 	assertFn(fn)
 	assertFn(efn)
 
@@ -34,7 +34,7 @@ type _task_fn struct {
 }
 
 func (t *_task_fn) _do() {
-	if err := KTry(t.fn, t.args...).(*KErr); err != nil {
+	if err := KTry(t.fn, t.args...); err != nil {
 		if t.efn != nil {
 			t.efn(err)
 		}
