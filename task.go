@@ -9,7 +9,12 @@ import (
 type TaskFn func(args ...interface{}) *_task_fn
 
 func NewTask(max int, maxDur time.Duration) *task {
-	_t := &task{max: max, maxDur: maxDur, q: make(chan *_task_fn, max), _curDur: make(chan time.Duration, max)}
+	_t := &task{
+		max: max, maxDur:
+		maxDur, q: make(chan *_task_fn, max),
+		_curDur:   make(chan time.Duration, max),
+		_ok:       make(chan bool, max),
+	}
 	go _t._handle()
 	return _t
 }
@@ -44,12 +49,13 @@ type task struct {
 	maxDur  time.Duration
 	curDur  time.Duration
 	_curDur chan time.Duration
+	_ok     chan bool
 	max     int
 	q       chan *_task_fn
 }
 
 func (t *task) Wait() {
-	for len(t.q) > 0 {
+	for len(t._ok) > 0 {
 		time.Sleep(time.Millisecond * 200)
 	}
 }
@@ -59,6 +65,7 @@ func (t *task) Do(f TaskFn, args ...interface{}) {
 	for {
 		if len(t.q) < t.max && t.curDur < t.maxDur {
 			t.q <- f(args...)
+			t._ok <- true
 			break
 		}
 
@@ -77,6 +84,7 @@ func (t *task) _handle() {
 		case _fn := <-t.q:
 			go func() {
 				t._curDur <- FnCost(_fn._do)
+				<-t._ok
 			}()
 		case _c := <-t._curDur:
 			t.curDur = _c

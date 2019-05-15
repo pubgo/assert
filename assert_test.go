@@ -75,6 +75,7 @@ func TestTask(t *testing.T) {
 }
 
 func TestTasks(t *testing.T) {
+
 	_fn := TaskOf(func(i int) {
 		fmt.Println(i)
 		T(i == 99, "99 error")
@@ -82,9 +83,9 @@ func TestTasks(t *testing.T) {
 		Throw(err)
 	})
 
-	var task = NewTask(100, time.Second)
+	var task = NewTask(10, time.Second)
 	for i := 0; i < 10000; i++ {
 		task.Do(_fn, i)
 	}
-
+	task.Wait()
 }
