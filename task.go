@@ -16,7 +16,6 @@ func NewTask(max int, maxDur time.Duration) *task {
 
 func TaskOf(fn interface{}, efn ...func(err error)) TaskFn {
 	assertFn(fn)
-	assertFn(efn)
 
 	return func(args ...interface{}) *_task_fn {
 		return &_task_fn{
