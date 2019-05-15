@@ -23,38 +23,41 @@ func (t *M) Tag(tag string) {
 	t.tag = tag
 }
 
-func ST(b bool, msg string, args ...interface{}) {
-	if b {
-		_m := fmt.Sprintf(msg, args...)
-		panic(&KErr{
-			Caller: funcCaller(),
-			Msg:    _m,
-			Err:    errors.New(_m),
-		})
+func T(b bool, msg string, args ...interface{}) {
+	if !b {
+		return
 	}
+
+	_m := fmt.Sprintf(msg, args...)
+	panic(&KErr{
+		Caller: funcCaller(),
+		Msg:    _m,
+		Err:    errors.New(_m),
+	})
 }
 
-func T(b bool, fn func(m *M)) {
-	if b {
-		_m := &M{M: make(map[string]interface{})}
-		fn(_m)
-
-		if len(_m.M) == 0 {
-			_m.M = nil
-		}
-
-		panic(&KErr{
-			Caller: funcCaller(),
-			Msg:    _m.msg,
-			Err:    errors.New(_m.msg),
-			Tag:    _m.tag,
-			M:      _m.M,
-		})
+func TT(b bool, fn func(m *M)) {
+	if !b {
+		return
 	}
+
+	_m := &M{M: make(map[string]interface{})}
+	fn(_m)
+
+	if len(_m.M) == 0 {
+		_m.M = nil
+	}
+
+	panic(&KErr{
+		Caller: funcCaller(),
+		Msg:    _m.msg,
+		Err:    errors.New(_m.msg),
+		Tag:    _m.tag,
+		M:      _m.M,
+	})
 }
 
-func ErrWrap(err error, fn func(m *M)) {
-
+func SWrap(err error, fn func(m *M)) {
 	if err == nil {
 		return
 	}
@@ -88,7 +91,7 @@ func ErrWrap(err error, fn func(m *M)) {
 	})
 }
 
-func SWrap(err error, msg string, args ...interface{}) {
+func ErrWrap(err error, msg string, args ...interface{}) {
 	if err == nil {
 		return
 	}

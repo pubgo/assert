@@ -2,7 +2,6 @@ package assert
 
 import (
 	"reflect"
-	"strconv"
 	"time"
 )
 
@@ -93,11 +92,7 @@ func IfNotIn(a interface{}, args ...interface{}) bool {
 	return !IfIn(a, args...)
 }
 
-func ToInt(p string) int {
-	r, err := strconv.Atoi(p)
-	SWrap(err, "can not convert %s to int,error(%s)", p, err)
-	return r
-}
+
 
 func FnCost(f func()) time.Duration {
 	t1 := time.Now()
@@ -154,6 +149,22 @@ func Ticker(fn func(dur time.Time) time.Duration) {
 		}
 
 		time.Sleep(_dur)
+	}
+}
+
+func For(fn func() bool, efn ...func(err error)) {
+	_b := true
+	for _b {
+		if err := Try(func() {
+			_b = fn()
+		}); err != nil {
+			if len(efn) != 0 && !IsNil(efn[0]) {
+				FnOf(efn[0], err)()
+			}
+
+			time.Sleep(time.Millisecond * 100)
+			continue
+		}
 	}
 }
 

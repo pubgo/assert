@@ -19,10 +19,10 @@ func fibonacci() func() int {
 }
 
 func assertFn(fn interface{}) {
-	ST(IsNil(fn), "the func is nil")
+	T(IsNil(fn), "the func is nil")
 
 	_v := reflect.TypeOf(fn)
-	ST(_v.Kind() != reflect.Func, "func type error(%s)", _v.String())
+	T(_v.Kind() != reflect.Func, "func type error(%s)", _v.String())
 }
 
 var goPath = build.Default.GOPATH

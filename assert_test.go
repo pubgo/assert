@@ -5,17 +5,18 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"time"
 )
 
 func a1() error {
 	return KTry(func() {
-		ErrWrap(errors.New("sbhbhbh"), func(m *M) {
+		SWrap(errors.New("sbhbhbh"), func(m *M) {
 			m.Msg("test shhh")
 			m.M["ss"] = 1
 			m.M["input"] = 1
 		})
 
-		T(true, func(m *M) {
+		TT(true, func(m *M) {
 			m.Msg("好东西%d", 1)
 		})
 	})
@@ -31,8 +32,8 @@ func TestName(t *testing.T) {
 
 	P(KTry(func() {
 		Throw(KTry(func() {
-			ErrWrap(KTry(func() {
-				ErrWrap(a1(), func(m *M) {
+			SWrap(KTry(func() {
+				SWrap(a1(), func(m *M) {
 					m.Msg("ok111")
 					m.Tag("test tag")
 				})
@@ -53,11 +54,11 @@ func TestType(t *testing.T) {
 
 func TestTry(t *testing.T) {
 	P(Try(func() {
-		ST(true, "sss")
+		T(true, "sss")
 	}))
 
 	P(KTry(func() {
-		ST(true, "sss")
+		T(true, "sss")
 	}))
 }
 
@@ -71,4 +72,19 @@ func TestTask(t *testing.T) {
 	var ss interface{}
 	sss, ok := ss.(FnT)
 	fmt.Println(sss, ok)
+}
+
+func TestTasks(t *testing.T) {
+	_fn := TaskOf(func(i int) {
+		fmt.Println(i)
+		T(i == 99, "99 error")
+	}, func(err error) {
+		Throw(err)
+	})
+
+	var task = NewTask(100, time.Second)
+	for i := 0; i < 10000; i++ {
+		task.Do(_fn, i)
+	}
+
 }

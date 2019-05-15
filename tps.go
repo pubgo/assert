@@ -1,6 +1,9 @@
 package assert
 
-import "reflect"
+import (
+	"reflect"
+	"strconv"
+)
 
 func StrOf(args ...string) []string {
 	return args
@@ -39,4 +42,10 @@ func IsNil(p interface{}) (b bool) {
 	}
 
 	return reflect.ValueOf(p).IsNil()
+}
+
+func ToInt(p string) int {
+	r, err := strconv.Atoi(p)
+	ErrWrap(err, "can not convert %s to int,error(%s)", p, err)
+	return r
 }

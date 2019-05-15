@@ -9,12 +9,12 @@ import (
 type TaskFn func(args ...interface{}) *_task_fn
 
 func NewTask(max int, maxDur time.Duration) *task {
-	_t := &task{max: max, maxDur: maxDur, q: make(chan *_task_fn, max)}
-	_t._handle()
+	_t := &task{max: max, maxDur: maxDur, q: make(chan *_task_fn, max), _curDur: make(chan time.Duration, max)}
+	go _t._handle()
 	return _t
 }
 
-func TaskOf(fn interface{}, efn func(err error)) TaskFn {
+func TaskOf(fn interface{}, efn ...func(err error)) TaskFn {
 	assertFn(fn)
 	assertFn(efn)
 
@@ -30,22 +30,29 @@ func TaskOf(fn interface{}, efn func(err error)) TaskFn {
 type _task_fn struct {
 	fn   interface{}
 	args []interface{}
-	efn  func(err error)
+	efn  []func(err error)
 }
 
 func (t *_task_fn) _do() {
 	if err := KTry(t.fn, t.args...); err != nil {
-		if t.efn != nil {
-			t.efn(err)
+		if len(t.efn) != 0 && t.efn[0] != nil {
+			t.efn[0](err)
 		}
 	}
 }
 
 type task struct {
-	maxDur time.Duration
-	curDur time.Duration
-	max    int
-	q      chan *_task_fn
+	maxDur  time.Duration
+	curDur  time.Duration
+	_curDur chan time.Duration
+	max     int
+	q       chan *_task_fn
+}
+
+func (t *task) Wait() {
+	for len(t.q) > 0 {
+		time.Sleep(time.Millisecond * 200)
+	}
 }
 
 func (t *task) Do(f TaskFn, args ...interface{}) {
@@ -66,16 +73,14 @@ func (t *task) Do(f TaskFn, args ...interface{}) {
 }
 
 func (t *task) _handle() {
-	go func() {
-		for {
-			select {
-			case _fn := <-t.q:
-				go func() {
-					t.curDur = FnCost(_fn._do)
-				}()
-			case <-time.NewTicker(time.Second * 2).C:
-
-			}
+	for {
+		select {
+		case _fn := <-t.q:
+			go func() {
+				t._curDur <- FnCost(_fn._do)
+			}()
+		case _c := <-t._curDur:
+			t.curDur = _c
 		}
-	}()
+	}
 }
