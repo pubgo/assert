@@ -78,14 +78,18 @@ func TestTasks(t *testing.T) {
 
 	_fn := TaskOf(func(i int) {
 		fmt.Println(i)
-		T(i == 99, "99 error")
+		T(i == 90, "90 error")
 	}, func(err error) {
 		Throw(err)
 	})
 
-	var task = NewTask(10, time.Second)
+	var task = NewTask(50, time.Second+time.Millisecond*10)
 	for i := 0; i < 10000; i++ {
-		task.Do(_fn, i)
+		if err := task.Do(_fn, i); err != nil {
+			fmt.Println(err)
+			break
+		}
 	}
+
 	task.Wait()
 }
