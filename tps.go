@@ -33,7 +33,7 @@ func IsErr(p interface{}) bool {
 func IsNil(p interface{}) (b bool) {
 	defer func() {
 		if err := recover(); err != nil {
-			b = false
+			b = true
 		}
 	}()
 
