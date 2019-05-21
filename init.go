@@ -2,6 +2,7 @@ package assert
 
 import (
 	"fmt"
+	jsoniter "github.com/json-iterator/go"
 	"go/build"
 	"os"
 	"path/filepath"
@@ -9,6 +10,8 @@ import (
 	"runtime"
 	"strings"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func fibonacci() func() int {
 	a1, a2 := 0, 1
