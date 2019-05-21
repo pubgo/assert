@@ -92,8 +92,6 @@ func IfNotIn(a interface{}, args ...interface{}) bool {
 	return !IfIn(a, args...)
 }
 
-
-
 func FnCost(f func()) time.Duration {
 	t1 := time.Now()
 	f()
@@ -111,14 +109,16 @@ func Retry(num int, fn func()) (err error) {
 	return
 }
 
-func WaitFor(fn func(dur time.Duration) bool) {
+func WaitFor(fn func(dur time.Duration) bool, efn ...func(err error)) {
 	var _b = true
 	for i := 0; _b; i++ {
 		if err := Try(func() {
 			_b = fn(time.Second * time.Duration(i))
 		}).(*KErr); err != nil {
 			err.Caller = funcCaller()
-			err.Panic()
+			if len(efn) != 0 && !IsNil(efn[0]) {
+				efn[0](err)
+			}
 		}
 
 		if !_b {
@@ -130,13 +130,17 @@ func WaitFor(fn func(dur time.Duration) bool) {
 	return
 }
 
-func Ticker(fn func(dur time.Time) time.Duration) {
-	_dur := time.Duration(0)
+func Ticker(fn func(dur time.Time) uint, efn ...func(err error)) {
+	var _dur uint = 0
 	for i := 0; ; i++ {
 		if err := Try(func() {
 			_dur = fn(time.Now())
 		}).(*KErr); err != nil {
 			err.Caller = funcCaller()
+			if len(efn) != 0 && !IsNil(efn[0]) {
+				efn[0](err)
+			}
+
 			err.Panic()
 		}
 
@@ -145,23 +149,22 @@ func Ticker(fn func(dur time.Time) time.Duration) {
 		}
 
 		if _dur == 0 {
-			_dur = time.Second
+			_dur = 1
 		}
 
-		time.Sleep(_dur)
+		time.Sleep(time.Duration(_dur))
 	}
 }
 
 func For(fn func() bool, efn ...func(err error)) {
-	_b := true
-	for _b {
-		if err := Try(func() {
+	_b := false
+	for !_b {
+		if err := KTry(func() {
 			_b = fn()
 		}); err != nil {
 			if len(efn) != 0 && !IsNil(efn[0]) {
-				FnOf(efn[0], err)()
+				efn[0](err)
 			}
-
 			time.Sleep(time.Millisecond * 100)
 			continue
 		}
