@@ -57,13 +57,23 @@ func TT(b bool, fn func(m *M)) {
 	})
 }
 
-func SWrap(err error, fn func(m *M)) {
-	if err == nil {
+func SWrap(err interface{}, fn func(m *M)) {
+	if IsNil(err) {
 		return
 	}
 
 	var m = &KErr{}
 	switch e := err.(type) {
+	case FnT:
+		assertFn(e)
+		T(reflect.TypeOf(e).NumOut() != 1, "the func num out error")
+		_err := e()[0].Interface()
+		if IsNil(_err) {
+			return
+		}
+
+		m.Err = _err.(error)
+		m.Msg = m.Err.Error()
 	case *KErr:
 		m = e
 	case error:
@@ -91,13 +101,23 @@ func SWrap(err error, fn func(m *M)) {
 	})
 }
 
-func ErrWrap(err error, msg string, args ...interface{}) {
-	if err == nil {
+func ErrWrap(err interface{}, msg string, args ...interface{}) {
+	if IsNil(err) {
 		return
 	}
 
 	var m = &KErr{}
 	switch e := err.(type) {
+	case FnT:
+		assertFn(e)
+		T(reflect.TypeOf(e).NumOut() != 1, "the func num out error")
+		_err := e()[0].Interface()
+		if IsNil(_err) {
+			return
+		}
+
+		m.Err = _err.(error)
+		m.Msg = m.Err.Error()
 	case *KErr:
 		m = e
 	case error:
@@ -114,18 +134,28 @@ func ErrWrap(err error, msg string, args ...interface{}) {
 	})
 }
 
-func Throw(err error) {
-	if err == nil {
+func Throw(err interface{}) {
+	if IsNil(err) {
 		return
 	}
 
 	var m = &KErr{}
 	switch e := err.(type) {
+	case FnT:
+		assertFn(e)
+		T(reflect.TypeOf(e).NumOut() != 1, "the func num out error")
+		_err := e()[0].Interface()
+		if IsNil(_err) {
+			return
+		}
+
+		m.Err = _err.(error)
+		m.Msg = m.Err.Error()
 	case *KErr:
 		m = e
 	case error:
 		m.Err = e
-		m.Msg = e.Error()
+		m.Msg = m.Err.Error()
 	}
 
 	var _tag = m.Tag

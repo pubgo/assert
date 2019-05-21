@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
-	"time"
 )
 
 func a1() error {
@@ -68,28 +67,10 @@ func TestIf(t *testing.T) {
 	fmt.Println(If(true, FnOf(ToInt, "2"), "ss").(int))
 	fmt.Println(reflect.TypeOf(FnOf(ToInt, "2")).Name())
 }
-func TestTask(t *testing.T) {
-	var ss interface{}
-	sss, ok := ss.(FnT)
-	fmt.Println(sss, ok)
+
+func ttttt() error {
+	return nil
 }
-
-func TestTasks(t *testing.T) {
-
-	_fn := TaskOf(func(i int) {
-		fmt.Println(i)
-		T(i == 90, "90 error")
-	}, func(err error) {
-		Throw(err)
-	})
-
-	var task = NewTask(50, time.Second+time.Millisecond*10)
-	for i := 0; i < 10000; i++ {
-		if err := task.Do(_fn, i); err != nil {
-			fmt.Println(err)
-			break
-		}
-	}
-
-	task.Wait()
+func TestTask(t *testing.T) {
+	ErrWrap(FnOf(ttttt), "err ")
 }
