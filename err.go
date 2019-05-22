@@ -17,7 +17,7 @@ func (t *KErr) Error() string {
 	return t.Err.Error()
 }
 
-func (t *KErr) StackTrace() interface{} {
+func (t *KErr) StackTrace() string {
 	_dt, _ := json.MarshalIndent(t, "", "\t")
 	return string(_dt)
 }

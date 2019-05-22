@@ -7,8 +7,6 @@ import (
 	"reflect"
 )
 
-const callDepth = 2
-
 type M struct {
 	msg string
 	tag string

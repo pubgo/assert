@@ -10,13 +10,7 @@ import (
 	"strings"
 )
 
-func fibonacci() func() int {
-	a1, a2 := 0, 1
-	return func() int {
-		a1, a2 = a2, a1+a2
-		return a1
-	}
-}
+const callDepth = 2
 
 func assertFn(fn interface{}) {
 	T(IsNil(fn), "the func is nil")
