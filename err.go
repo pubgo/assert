@@ -18,7 +18,7 @@ func (t *KErr) Error() string {
 }
 
 func (t *KErr) StackTrace() interface{} {
-	_dt, _ := json.Marshal(t)
+	_dt, _ := json.MarshalIndent(t, "", "\t")
 	return string(_dt)
 }
 
