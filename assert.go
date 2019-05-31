@@ -99,6 +99,14 @@ func SWrap(err interface{}, fn func(m *M)) {
 	})
 }
 
+func Wrap(err error, msg string, args ...interface{}) error {
+	return &KErr{
+		Caller: funcCaller(callDepth),
+		Msg:    fmt.Sprintf(msg, args...),
+		Err:    err,
+	}
+}
+
 func ErrWrap(err interface{}, msg string, args ...interface{}) {
 	if IsNil(err) {
 		return
@@ -130,13 +138,6 @@ func ErrWrap(err interface{}, msg string, args ...interface{}) {
 		Msg:    _m,
 		Err:    m.tErr(),
 	})
-}
-
-func Catch(fn interface{}, args ...interface{}) {
-	if err:=KTry(fn,args...);err !=nil{
-		err.(*KErr).Caller=funcCaller(callDepth)
-		panic(err)
-	}
 }
 
 func Throw(err interface{}) {
