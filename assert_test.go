@@ -74,3 +74,11 @@ func ttttt() error {
 func TestTask(t *testing.T) {
 	ErrWrap(FnOf(ttttt), "err ")
 }
+
+func TestCatch(t *testing.T) {
+	P(Try(func() {
+		Catch(func() {
+			panic("ddd")
+		})
+	}))
+}

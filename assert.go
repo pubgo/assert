@@ -28,7 +28,7 @@ func T(b bool, msg string, args ...interface{}) {
 
 	_m := fmt.Sprintf(msg, args...)
 	panic(&KErr{
-		Caller: funcCaller(),
+		Caller: funcCaller(callDepth),
 		Msg:    _m,
 		Err:    errors.New(_m),
 	})
@@ -47,7 +47,7 @@ func TT(b bool, fn func(m *M)) {
 	}
 
 	panic(&KErr{
-		Caller: funcCaller(),
+		Caller: funcCaller(callDepth),
 		Msg:    _m.msg,
 		Err:    errors.New(_m.msg),
 		Tag:    _m.tag,
@@ -91,7 +91,7 @@ func SWrap(err interface{}, fn func(m *M)) {
 
 	panic(&KErr{
 		Sub:    m,
-		Caller: funcCaller(),
+		Caller: funcCaller(callDepth),
 		Msg:    _m.msg,
 		Err:    m.tErr(),
 		Tag:    _tag,
@@ -126,10 +126,17 @@ func ErrWrap(err interface{}, msg string, args ...interface{}) {
 	_m := fmt.Sprintf(msg, args...)
 	panic(&KErr{
 		Sub:    m,
-		Caller: funcCaller(),
+		Caller: funcCaller(callDepth),
 		Msg:    _m,
 		Err:    m.tErr(),
 	})
+}
+
+func Catch(fn interface{}, args ...interface{}) {
+	if err:=KTry(fn,args...);err !=nil{
+		err.(*KErr).Caller=funcCaller(callDepth)
+		panic(err)
+	}
 }
 
 func Throw(err interface{}) {
@@ -161,7 +168,7 @@ func Throw(err interface{}) {
 
 	panic(&KErr{
 		Sub:    m,
-		Caller: funcCaller(),
+		Caller: funcCaller(callDepth),
 		Err:    m.tErr(),
 		Tag:    _tag,
 	})
