@@ -94,7 +94,7 @@ func IfNotIn(a interface{}, args ...interface{}) bool {
 
 func FnCost(f func()) time.Duration {
 	t1 := time.Now()
-	f()
+	Try(f)
 	return time.Now().Sub(t1)
 }
 
