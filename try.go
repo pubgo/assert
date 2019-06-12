@@ -26,11 +26,16 @@ func KTry(fn interface{}, args ...interface{}) (err error) {
 		case error:
 			m.Err = d
 			m.Msg = d.Error()
+			m.Caller = funcCaller(callDepth)
 		case string:
 			m.Err = errors.New(d)
 			m.Msg = d
+			m.Caller = funcCaller(callDepth)
 		default:
-			panic(fmt.Sprintf("type error %v", d))
+			m.Msg = fmt.Sprintf("type error %v", d)
+			m.Err = errors.New(m.Msg)
+			m.Caller = funcCaller(callDepth)
+			m.Tag = "unknown_error"
 		}
 	}
 
