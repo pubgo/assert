@@ -29,7 +29,7 @@ func TestName(t *testing.T) {
 
 	fmt.Println(IsNil(a1()))
 
-	P(KTry(func() {
+	fmt.Println(KTry(func() {
 		Throw(KTry(func() {
 			SWrap(KTry(func() {
 				SWrap(a1(), func(m *M) {
@@ -40,7 +40,7 @@ func TestName(t *testing.T) {
 				m.Msg("test 123")
 			})
 		}))
-	}))
+	}).(*KErr).StackTrace())
 }
 
 func TestType(t *testing.T) {

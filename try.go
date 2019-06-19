@@ -17,8 +17,10 @@ func Try(fn interface{}, args ...interface{}) (r interface{}) {
 	return
 }
 
-func KTry(fn interface{}, args ...interface{}) (err error) {
+func KTry(fn interface{}, args ...interface{}) error {
 	m := kerrGet()
+	defer kerrPut(m)
+
 	if r := Try(fn, args...); r != nil {
 		switch d := r.(type) {
 		case *KErr:
@@ -39,13 +41,9 @@ func KTry(fn interface{}, args ...interface{}) (err error) {
 		}
 	}
 
-	fmt.Println()
 	if m.err == nil {
-		err = nil
-	} else {
-		err = m.copy()
+		return nil
 	}
 
-	kerrPut(m)
-	return
+	return m.copy()
 }

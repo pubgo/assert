@@ -2,15 +2,35 @@ package assert
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
+type _KErr struct {
+	Tag    string                 `json:"tag,omitempty"`
+	M      map[string]interface{} `json:"m,omitempty"`
+	Err    error                  `json:"err,omitempty"`
+	Msg    string                 `json:"msg,omitempty"`
+	Caller string                 `json:"caller,omitempty"`
+	Sub    *_KErr                 `json:"sub,omitempty"`
+}
+
 type KErr struct {
-	tag    string                 `json:"tag,omitempty"`
-	m      map[string]interface{} `json:"m,omitempty"`
-	err    error                  `json:"err,omitempty"`
-	msg    string                 `json:"msg,omitempty"`
-	caller string                 `json:"caller,omitempty"`
-	sub    *KErr                  `json:"sub,omitempty"`
+	tag    string
+	m      map[string]interface{}
+	err    error
+	msg    string
+	caller string
+	sub    *KErr
+}
+
+func (t *KErr) kerr() *_KErr {
+	return &_KErr{
+		Tag:    t.tag,
+		M:      t.m,
+		Err:    t.err,
+		Msg:    t.msg,
+		Caller: t.caller,
+	}
 }
 
 func (t *KErr) copy() *KErr {
@@ -24,6 +44,10 @@ func (t *KErr) copy() *KErr {
 	}
 }
 
+func (t *KErr) Err() error {
+	return t.err
+}
+
 func (t *KErr) Error() string {
 	return t.err.Error()
 }
@@ -33,7 +57,15 @@ func (t *KErr) Caller(caller string) {
 }
 
 func (t *KErr) StackTrace() string {
-	_dt, _ := json.MarshalIndent(t, "", "\t")
+	kerr := t.kerr()
+	c := kerr
+	for t.sub != nil {
+		c.Sub = t.sub.kerr()
+		t.sub = t.sub.sub
+		c = c.Sub
+	}
+
+	_dt, _ := json.MarshalIndent(kerr, "", "\t")
 	return string(_dt)
 }
 
@@ -43,10 +75,6 @@ func (t *KErr) tErr() (err error) {
 	return
 }
 
-func (t *KErr) Panic() {
-	panic(t)
-}
-
 func (t *KErr) P() {
-	P(t)
+	fmt.Println(t.StackTrace())
 }
