@@ -5,16 +5,31 @@ import (
 )
 
 type KErr struct {
-	Tag    string                 `json:"tag,omitempty"`
-	M      map[string]interface{} `json:"m,omitempty"`
-	Err    error                  `json:"err,omitempty"`
-	Msg    string                 `json:"msg,omitempty"`
-	Caller string                 `json:"caller,omitempty"`
-	Sub    *KErr                  `json:"sub,omitempty"`
+	tag    string                 `json:"tag,omitempty"`
+	m      map[string]interface{} `json:"m,omitempty"`
+	err    error                  `json:"err,omitempty"`
+	msg    string                 `json:"msg,omitempty"`
+	caller string                 `json:"caller,omitempty"`
+	sub    *KErr                  `json:"sub,omitempty"`
+}
+
+func (t *KErr) copy() *KErr {
+	return &KErr{
+		tag:    t.tag,
+		m:      t.m,
+		err:    t.err,
+		msg:    t.msg,
+		caller: t.caller,
+		sub:    t.sub,
+	}
 }
 
 func (t *KErr) Error() string {
-	return t.Err.Error()
+	return t.err.Error()
+}
+
+func (t *KErr) Caller(caller string) {
+	t.caller = caller
 }
 
 func (t *KErr) StackTrace() string {
@@ -23,8 +38,8 @@ func (t *KErr) StackTrace() string {
 }
 
 func (t *KErr) tErr() (err error) {
-	err = t.Err
-	t.Err = nil
+	err = t.err
+	t.err = nil
 	return
 }
 

@@ -28,9 +28,9 @@ func T(b bool, msg string, args ...interface{}) {
 
 	_m := fmt.Sprintf(msg, args...)
 	panic(&KErr{
-		Caller: funcCaller(callDepth),
-		Msg:    _m,
-		Err:    errors.New(_m),
+		caller: funcCaller(callDepth),
+		msg:    _m,
+		err:    errors.New(_m),
 	})
 }
 
@@ -47,11 +47,11 @@ func TT(b bool, fn func(m *M)) {
 	}
 
 	panic(&KErr{
-		Caller: funcCaller(callDepth),
-		Msg:    _m.msg,
-		Err:    errors.New(_m.msg),
-		Tag:    _m.tag,
-		M:      _m.M,
+		caller: funcCaller(callDepth),
+		msg:    _m.msg,
+		err:    errors.New(_m.msg),
+		tag:    _m.tag,
+		m:      _m.M,
 	})
 }
 
@@ -70,40 +70,40 @@ func SWrap(err interface{}, fn func(m *M)) {
 			return
 		}
 
-		m.Err = _err.(error)
-		m.Msg = m.Err.Error()
+		m.err = _err.(error)
+		m.msg = m.err.Error()
 	case *KErr:
 		m = e
 	case error:
-		m.Msg = e.Error()
-		m.Err = e
+		m.msg = e.Error()
+		m.err = e
 	}
 
 	_m := &M{M: make(map[string]interface{})}
 	fn(_m)
 
-	var _tag = If(_m.tag == "", m.Tag, _m.tag).(string)
-	m.Tag = ""
+	var _tag = If(_m.tag == "", m.tag, _m.tag).(string)
+	m.tag = ""
 
 	if len(_m.M) == 0 {
 		_m.M = nil
 	}
 
 	panic(&KErr{
-		Sub:    m,
-		Caller: funcCaller(callDepth),
-		Msg:    _m.msg,
-		Err:    m.tErr(),
-		Tag:    _tag,
-		M:      _m.M,
+		sub:    m,
+		caller: funcCaller(callDepth),
+		msg:    _m.msg,
+		err:    m.tErr(),
+		tag:    _tag,
+		m:      _m.M,
 	})
 }
 
 func Wrap(err error, msg string, args ...interface{}) error {
 	return &KErr{
-		Caller: funcCaller(callDepth),
-		Msg:    fmt.Sprintf(msg, args...),
-		Err:    err,
+		caller: funcCaller(callDepth),
+		msg:    fmt.Sprintf(msg, args...),
+		err:    err,
 	}
 }
 
@@ -122,21 +122,21 @@ func ErrWrap(err interface{}, msg string, args ...interface{}) {
 			return
 		}
 
-		m.Err = _err.(error)
-		m.Msg = m.Err.Error()
+		m.err = _err.(error)
+		m.msg = m.err.Error()
 	case *KErr:
 		m = e
 	case error:
-		m.Msg = e.Error()
-		m.Err = e
+		m.msg = e.Error()
+		m.err = e
 	}
 
 	_m := fmt.Sprintf(msg, args...)
 	panic(&KErr{
-		Sub:    m,
-		Caller: funcCaller(callDepth),
-		Msg:    _m,
-		Err:    m.tErr(),
+		sub:    m,
+		caller: funcCaller(callDepth),
+		msg:    _m,
+		err:    m.tErr(),
 	})
 }
 
@@ -155,23 +155,23 @@ func Throw(err interface{}) {
 			return
 		}
 
-		m.Err = _err.(error)
-		m.Msg = m.Err.Error()
+		m.err = _err.(error)
+		m.msg = m.err.Error()
 	case *KErr:
 		m = e
 	case error:
-		m.Err = e
-		m.Msg = m.Err.Error()
+		m.err = e
+		m.msg = m.err.Error()
 	}
 
-	var _tag = m.Tag
-	m.Tag = ""
+	var _tag = m.tag
+	m.tag = ""
 
 	panic(&KErr{
-		Sub:    m,
-		Caller: funcCaller(callDepth),
-		Err:    m.tErr(),
-		Tag:    _tag,
+		sub:    m,
+		caller: funcCaller(callDepth),
+		err:    m.tErr(),
+		tag:    _tag,
 	})
 }
 

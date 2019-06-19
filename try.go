@@ -18,31 +18,34 @@ func Try(fn interface{}, args ...interface{}) (r interface{}) {
 }
 
 func KTry(fn interface{}, args ...interface{}) (err error) {
-	m := &KErr{}
+	m := kerrGet()
 	if r := Try(fn, args...); r != nil {
 		switch d := r.(type) {
 		case *KErr:
 			m = d
 		case error:
-			m.Err = d
-			m.Msg = d.Error()
-			m.Caller = funcCaller(callDepth)
+			m.err = d
+			m.msg = d.Error()
+			m.caller = funcCaller(callDepth)
 		case string:
-			m.Err = errors.New(d)
-			m.Msg = d
-			m.Caller = funcCaller(callDepth)
+			m.err = errors.New(d)
+			m.msg = d
+			m.caller = funcCaller(callDepth)
 		default:
-			m.Msg = fmt.Sprintf("type error %v", d)
-			m.Err = errors.New(m.Msg)
-			m.Caller = funcCaller(callDepth)
-			m.Tag = ErrTag.UnknownErr
+			m.msg = fmt.Sprintf("type error %v", d)
+			m.err = errors.New(m.msg)
+			m.caller = funcCaller(callDepth)
+			m.tag = ErrTag.UnknownErr
 		}
 	}
 
-	if m.Err == nil {
+	fmt.Println()
+	if m.err == nil {
 		err = nil
 	} else {
-		err = m
+		err = m.copy()
 	}
+
+	kerrPut(m)
 	return
 }
