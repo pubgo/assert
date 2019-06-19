@@ -1,10 +1,5 @@
 package assert
 
-import (
-	"encoding/json"
-	"fmt"
-)
-
 type _KErr struct {
 	Tag    string                 `json:"tag,omitempty"`
 	M      map[string]interface{} `json:"m,omitempty"`
@@ -60,7 +55,7 @@ func (t *KErr) Tag() string {
 	return t.tag
 }
 
-func (t *KErr) StackTrace() string {
+func (t *KErr) StackTrace() interface{} {
 	kerr := t.kerr()
 	c := kerr
 	for t.sub != nil {
@@ -68,9 +63,7 @@ func (t *KErr) StackTrace() string {
 		t.sub = t.sub.sub
 		c = c.Sub
 	}
-
-	_dt, _ := json.MarshalIndent(kerr, "", "\t")
-	return string(_dt)
+	return kerr
 }
 
 func (t *KErr) tErr() (err error) {
@@ -80,5 +73,5 @@ func (t *KErr) tErr() (err error) {
 }
 
 func (t *KErr) P() {
-	fmt.Println(t.StackTrace())
+	P(t.StackTrace())
 }
