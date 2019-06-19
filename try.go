@@ -35,7 +35,7 @@ func KTry(fn interface{}, args ...interface{}) (err error) {
 			m.Msg = fmt.Sprintf("type error %v", d)
 			m.Err = errors.New(m.Msg)
 			m.Caller = funcCaller(callDepth)
-			m.Tag = "unknown_error"
+			m.Tag = ErrTag.UnknownErr
 		}
 	}
 
