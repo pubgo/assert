@@ -56,6 +56,10 @@ func (t *KErr) Caller(caller string) {
 	t.caller = caller
 }
 
+func (t *KErr) Tag() string {
+	return t.tag
+}
+
 func (t *KErr) StackTrace() string {
 	kerr := t.kerr()
 	c := kerr
