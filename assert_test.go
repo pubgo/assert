@@ -7,58 +7,48 @@ import (
 	"testing"
 )
 
-func a1() error {
-	return KTry(func() {
-		SWrap(errors.New("sbhbhbh"), func(m *M) {
-			m.Msg("test shhh")
-			m.M["ss"] = 1
-			m.M["input"] = 1
-		})
+func a1() {
+	defer Panic(func(m *M) {
+		m.Msg("test SWrap")
+	})
 
-		TT(true, func(m *M) {
-			m.Msg("好东西%d", 1)
-		})
+	SWrap(errors.New("sbhbhbh"), func(m *M) {
+		m.Msg("test shhh")
+		m.M["ss"] = 1
+		m.M["input"] = 1
 	})
 }
 
 func TestName(t *testing.T) {
+	defer Debug()
+
 	P(IfEquals(1, 2, 34))
 	P(IfEquals(nil, nil))
 	P(IfEquals(0, ""))
 	P(IfEquals("", ""))
 
-	fmt.Println(IsNil(a1()))
+	ErrHandle(KTry(a1), func(err *KErr) {
+		err.P()
+	})
 
-	fmt.Println(KTry(func() {
-		Throw(KTry(func() {
-			SWrap(KTry(func() {
-				SWrap(a1(), func(m *M) {
-					m.Msg("ok111")
-					m.Tag("test tag")
-				})
-			}), func(m *M) {
-				m.Msg("test 123")
+	Throw(KTry(func() {
+		SWrap(KTry(func() {
+			SWrap(KTry(a1), func(m *M) {
+				m.Msg("ok111")
+				m.Tag("test tag")
 			})
-		}))
-	}).(*KErr).StackTrace())
-}
-
-func TestType(t *testing.T) {
-	var ss map[string]interface{}
-	var s interface{}
-	for _, i := range ObjOf("1", 0, errors.New(""), nil, []string{}, ss, s) {
-		fmt.Println(IsNil(i))
-	}
+		}), func(m *M) {
+			m.Msg("test 123")
+		})
+	}))
 }
 
 func TestTry(t *testing.T) {
-	P(Try(func() {
-		T(true, "sss")
-	}))
+	defer Debug()
 
-	P(KTry(func() {
-		T(true, "sss")
-	}))
+	Cfg.Debug = true
+
+	T(true, "sss")
 }
 
 func TestIf(t *testing.T) {
@@ -68,40 +58,59 @@ func TestIf(t *testing.T) {
 	fmt.Println(reflect.TypeOf(FnOf(ToInt, "2")).Name())
 }
 
-func ttttt() error {
-	return nil
-}
 func TestTask(t *testing.T) {
-	ErrHandle(KTry(func() {
-		Throw(Wrap(KTry(func() {
-			ErrWrap(errors.New("dd"), "err ")
-		}), "test wrap"))
-	}), func(err *KErr) {
-		err.P()
-	})
+	defer Debug()
 
-	ErrHandle(KTry(func() {
-		ee := Wrap(errors.New("dd"), "err ")
-		Throw(ee)
-	}), func(err *KErr) {
-		err.P()
-	})
+	Throw(Wrap(KTry(func() {
+		ErrWrap(errors.New("dd"), "err ")
+	}), "test wrap"))
 }
 
 func test123() {
-	defer Panic("test panic %d", 33)
+	defer Panic(func(m *M) {
+		m.Msg("test panic %d", 33)
+	})
 
 	ErrWrap(errors.New("hello error"), "sss")
-}
-
-func TestExpect(t *testing.T) {
-	ErrHandle(KTry(test123), func(err *KErr) {
-		err.P()
-	})
 }
 
 func TestExpect11(t *testing.T) {
 	defer Debug()
 
+	Cfg.Debug=true
+
 	test123()
+}
+
+func TestIsNil(t *testing.T) {
+	defer Debug()
+
+	var ss = func() map[string]interface{} {
+		return make(map[string]interface{})
+	}
+
+	var ss1 = func() map[string]interface{} {
+		return nil
+	}
+
+	var s = 1
+	var ss2 map[string]interface{}
+	t.Log(IsNil(1))
+	t.Log(IsNil(1.2))
+	t.Log(IsNil(nil))
+	t.Log(IsNil("ss"))
+	t.Log(IsNil(map[string]interface{}{}))
+	t.Log(IsNil(ss()))
+	t.Log(IsNil(ss1()))
+	t.Log(IsNil(&s))
+	t.Log(IsNil(ss2))
+}
+
+func TestResponce(t *testing.T) {
+	defer Resp(func(err *KErr) {
+		err.Tag()
+		err.StackTrace()
+	})
+
+	T(true, "data handle")
 }

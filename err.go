@@ -72,6 +72,12 @@ func (t *KErr) tErr() (err error) {
 	return
 }
 
+func (t *KErr) tTag(tag string) string {
+	tag = If(tag == "", t.tag, tag).(string)
+	t.tag = ""
+	return tag
+}
+
 func (t *KErr) P() {
 	P(t.StackTrace())
 }

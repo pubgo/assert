@@ -34,7 +34,7 @@ func KTry(fn interface{}, args ...interface{}) error {
 			m.msg = d
 			m.caller = funcCaller(callDepth)
 		default:
-			m.msg = fmt.Sprintf("type error %v", d)
+			m.msg = fmt.Sprintf("type error %#v", d)
 			m.err = errors.New(m.msg)
 			m.caller = funcCaller(callDepth)
 			m.tag = ErrTag.UnknownErr
@@ -48,10 +48,20 @@ func KTry(fn interface{}, args ...interface{}) error {
 	return m.copy()
 }
 
-func ErrHandle(err error, fn func(err *KErr)) {
-	if err == nil || IsNil(err) {
+func ErrHandle(err interface{}, fn func(err *KErr)) {
+	if IsNil(err) {
 		return
 	}
 
-	fn(err.(*KErr))
+	if _e, ok := err.(*KErr); ok {
+		fn(_e)
+		return
+	}
+
+	if _e, ok := err.(error); ok {
+		fmt.Println(_e.Error())
+		return
+	}
+
+	fmt.Printf("%#v", err)
 }
