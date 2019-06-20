@@ -63,12 +63,6 @@ func (t *KErr) StackTrace() interface{} {
 		t.sub = t.sub.sub
 		c = c.Sub
 	}
-
-	if kerr.M ==nil{
-		kerr.M=make(map[string]interface{})
-	}
-
-	kerr.M["err_msg"] = kerr.Err.Error()
 	return kerr
 }
 
