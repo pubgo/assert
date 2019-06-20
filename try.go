@@ -47,3 +47,11 @@ func KTry(fn interface{}, args ...interface{}) error {
 
 	return m.copy()
 }
+
+func ErrHandle(err error, fn func(err *KErr)) {
+	if IsNil(err) {
+		return
+	}
+
+	fn(err.(*KErr))
+}
