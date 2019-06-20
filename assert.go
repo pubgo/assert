@@ -100,10 +100,20 @@ func SWrap(err interface{}, fn func(m *M)) {
 }
 
 func Wrap(err error, msg string, args ...interface{}) error {
+	var m = &KErr{}
+	switch e := err.(type) {
+	case *KErr:
+		m = e
+	case error:
+		m.msg = e.Error()
+		m.err = e
+	}
+
 	return &KErr{
+		sub:    m,
 		caller: funcCaller(callDepth),
 		msg:    fmt.Sprintf(msg, args...),
-		err:    err,
+		err:    m.tErr(),
 	}
 }
 

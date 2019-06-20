@@ -72,7 +72,20 @@ func ttttt() error {
 	return nil
 }
 func TestTask(t *testing.T) {
-	ErrWrap(FnOf(ttttt), "err ")
+	ErrHandle(KTry(func() {
+		Throw(Wrap(KTry(func() {
+			ErrWrap(errors.New("dd"), "err ")
+		}), "test wrap"))
+	}), func(err *KErr) {
+		err.P()
+	})
+
+	ErrHandle(KTry(func() {
+		ee:=Wrap(errors.New("dd"), "err ")
+		Throw(ee)
+	}), func(err *KErr) {
+		err.P()
+	})
 }
 
 func TestExpect(t *testing.T) {
