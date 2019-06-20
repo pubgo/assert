@@ -49,7 +49,7 @@ func KTry(fn interface{}, args ...interface{}) error {
 }
 
 func ErrHandle(err error, fn func(err *KErr)) {
-	if IsNil(err) {
+	if err == nil || IsNil(err) {
 		return
 	}
 

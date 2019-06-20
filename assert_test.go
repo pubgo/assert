@@ -90,6 +90,7 @@ func TestTask(t *testing.T) {
 
 func test123() {
 	defer Panic("test panic %d", 33)
+
 	ErrWrap(errors.New("hello error"), "sss")
 }
 
@@ -97,4 +98,10 @@ func TestExpect(t *testing.T) {
 	ErrHandle(KTry(test123), func(err *KErr) {
 		err.P()
 	})
+}
+
+func TestExpect11(t *testing.T) {
+	defer Debug()
+
+	test123()
 }

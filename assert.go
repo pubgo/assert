@@ -118,7 +118,12 @@ func Wrap(err error, msg string, args ...interface{}) error {
 }
 
 func Debug() {
-	ErrHandle(KTry(Panic, "debug"), func(err *KErr) {
+	err := recover()
+	if err == nil || IsNil(err) {
+		return
+	}
+
+	ErrHandle(err.(error), func(err *KErr) {
 		err.P()
 	})
 }
