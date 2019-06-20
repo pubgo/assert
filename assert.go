@@ -107,7 +107,7 @@ func Wrap(err error, msg string, args ...interface{}) error {
 	}
 }
 
-func Expect(fn func(), msg string, args ...interface{}) {
+func Expect(msg string, fn func()) {
 	assertFn(fn)
 	err := KTry(fn)
 	if IsNil(err) {
@@ -123,11 +123,10 @@ func Expect(fn func(), msg string, args ...interface{}) {
 		m.err = e
 	}
 
-	_m := fmt.Sprintf(msg, args...)
 	panic(&KErr{
 		sub:    m,
 		caller: funcCaller(8),
-		msg:    _m,
+		msg:    msg,
 		err:    m.tErr(),
 	})
 }

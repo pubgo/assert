@@ -76,9 +76,9 @@ func TestTask(t *testing.T) {
 }
 
 func TestExpect(t *testing.T) {
-	if err:=KTry(Expect, func() {
-		T(true,"hello error")
-	}, "test expect ");err !=nil{
+	if err := KTry(Expect, "test expect ", func() {
+		T(true, "hello error")
+	}); err != nil {
 		err.(*KErr).P()
 	}
 }
