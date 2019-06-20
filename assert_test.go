@@ -74,3 +74,11 @@ func ttttt() error {
 func TestTask(t *testing.T) {
 	ErrWrap(FnOf(ttttt), "err ")
 }
+
+func TestExpect(t *testing.T) {
+	if err:=KTry(Expect, func() {
+		T(true,"hello error")
+	}, "test expect ");err !=nil{
+		err.(*KErr).P()
+	}
+}

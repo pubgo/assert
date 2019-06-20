@@ -107,6 +107,31 @@ func Wrap(err error, msg string, args ...interface{}) error {
 	}
 }
 
+func Expect(fn func(), msg string, args ...interface{}) {
+	assertFn(fn)
+	err := KTry(fn)
+	if IsNil(err) {
+		return
+	}
+
+	var m = &KErr{}
+	switch e := err.(type) {
+	case *KErr:
+		m = e
+	case error:
+		m.msg = e.Error()
+		m.err = e
+	}
+
+	_m := fmt.Sprintf(msg, args...)
+	panic(&KErr{
+		sub:    m,
+		caller: funcCaller(8),
+		msg:    _m,
+		err:    m.tErr(),
+	})
+}
+
 func ErrWrap(err interface{}, msg string, args ...interface{}) {
 	if IsNil(err) {
 		return
@@ -116,7 +141,7 @@ func ErrWrap(err interface{}, msg string, args ...interface{}) {
 	switch e := err.(type) {
 	case FnT:
 		assertFn(e)
-		T(reflect.TypeOf(e).NumOut() != 1, "the func num out error")
+		T(reflect.TypeOf(e).NumOut() != 1, "the func out num error")
 		_err := e()[0].Interface()
 		if IsNil(_err) {
 			return
