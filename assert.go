@@ -117,10 +117,9 @@ func Wrap(err error, msg string, args ...interface{}) error {
 	}
 }
 
-func Expect(msg string, fn func()) {
-	assertFn(fn)
-	err := KTry(fn)
-	if IsNil(err) {
+func Panic(msg string, args ...interface{}) {
+	err := recover()
+	if err == nil || IsNil(err) {
 		return
 	}
 
@@ -131,12 +130,19 @@ func Expect(msg string, fn func()) {
 	case error:
 		m.msg = e.Error()
 		m.err = e
+	case string:
+		m.err = errors.New(e)
+		m.msg = e
+	default:
+		m.msg = fmt.Sprintf("type error %v", e)
+		m.err = errors.New(m.msg)
+		m.tag = ErrTag.UnknownErr
 	}
 
 	panic(&KErr{
 		sub:    m,
-		caller: funcCaller(8),
-		msg:    msg,
+		caller: funcCaller(4),
+		msg:    fmt.Sprintf(msg, args...),
 		err:    m.tErr(),
 	})
 }

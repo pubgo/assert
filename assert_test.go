@@ -81,17 +81,20 @@ func TestTask(t *testing.T) {
 	})
 
 	ErrHandle(KTry(func() {
-		ee:=Wrap(errors.New("dd"), "err ")
+		ee := Wrap(errors.New("dd"), "err ")
 		Throw(ee)
 	}), func(err *KErr) {
 		err.P()
 	})
 }
 
+func test123() {
+	defer Panic("test panic %d", 33)
+	ErrWrap(errors.New("hello error"), "sss")
+}
+
 func TestExpect(t *testing.T) {
-	ErrHandle(KTry(Expect, "test expect ", func() {
-		T(true, "hello error")
-	}), func(err *KErr) {
+	ErrHandle(KTry(test123), func(err *KErr) {
 		err.P()
 	})
 }
